@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env
+
+# VSCode
+.vscode/
+
+# Torch / large model files
+*.pt
+*.bin
+*.safetensors
