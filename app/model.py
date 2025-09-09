@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from transformers import AutoModel, AutoTokenizer
 from safetensors.torch import load_file
-from .config import DEVICE, MODEL_PATH, label_maps
+from .modelSource import DEVICE, MODEL_PATH, label_maps
 
 class MultiTaskXLMRModel(nn.Module):
     def __init__(self, model_checkpoint, num_ner_labels, num_intent_labels,

@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from .config import label_maps
+from .modelSource import label_maps
 from .model import tokenizer
 
 def decode_ner_confident(text, ner_logits, label_map):

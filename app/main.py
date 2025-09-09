@@ -7,7 +7,7 @@ import httpx
 import itertools
 
 from app.model import model, tokenizer
-from app.config import DEVICE, label_maps
+from app.modelSource import DEVICE, label_maps
 from app.preprocess import convert_sentence, bangla_to_english, suffix_map
 from app.decode import decode_ner_confident, get_label
 
