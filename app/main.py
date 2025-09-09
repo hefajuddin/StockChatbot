@@ -10,6 +10,7 @@ from app.model import model, tokenizer
 from app.modelSource import DEVICE, label_maps
 from app.preprocess import convert_sentence, bangla_to_english, suffix_map
 from app.decode import decode_ner_confident, get_label
+from app.config import BASE_OMS_URL, LOGIN_ENDPOINT, SHAREPRICE_ENDPOINT
 
 
 # ================== CONFIG ==================
@@ -74,7 +75,8 @@ async def login(request: LoginRequest):
     """
     global auth_token
     async with httpx.AsyncClient() as client:
-        url = f"{BASE_OMS_URL}/Login"
+        # url = f"{BASE_OMS_URL}/Login"
+        url = f"{LOGIN_ENDPOINT}"
         response = await client.post(url, json=request.dict())
 
     if response.status_code != 200:
@@ -169,6 +171,16 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
         language_label = get_label(language_logits, label_maps["language_label2id"])
         context_label = get_label(context_logits, label_maps["context_label2id"])
 
+
+        if intent_label=='sharePrice':
+            requiredEndpoint = SHAREPRICE_ENDPOINT
+            elif intent_label=='portfolio':
+                requiredEndpoint = PORTFOLIO_ENDPOINT
+            elif intent_label=='balance':
+                requiredEndpoint = BALANCE_ENDPOINT
+            else:
+                requiredEndpoint = None
+
         # ================== OMS API CALL ==================
         market_depths = []
         headers = {"Authorization": f"Bearer {token}"}
@@ -181,7 +193,7 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
 
         async with httpx.AsyncClient() as client:
             for se, mt, tc in combos:
-                url = f"{BASE_OMS_URL}/market-depths/{se}/{mt}/{tc}"
+                url = f"{requiredEndpoint}/{se}/{mt}/{tc}"
                 try:
                     resp = await client.get(url, headers=headers)
                     if resp.status_code == 200:
