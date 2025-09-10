@@ -4,15 +4,17 @@ RESPONSES = {
     "bn": {
         "sentiment": {
             "positive": "নিশ্চই স্যার...",
-            "angry": "আপনাকে সন্তুষ্ট করতে না পারার জন্য দুঃখিত; দয়াকরে শান্ত হোন। উত্তেজিত অবস্থায় সঠিক সিদ্ধান্ত নেওয়া কঠিন।",
+            "angry": "আপনার কষ্টের কারণ হয়ে থাকলে দুঃখিত; দয়াকরে শান্ত হোন। উত্তেজিত অবস্থায় সঠিক সিদ্ধান্ত নেওয়া কঠিন।",
             "bye": "আপনাকে ধন্যবাদ। কোনো প্রশ্ন থাকলে পরবর্তীতে জানাবেন।",
             "appreciate": "আপনাকে অনেক অনেক ধন্যবাদ। আমি ভবিষ্যতে আরো ইমপ্রুভ করার চেষ্টা করব।",
-            "introduction": "আমি একজন স্টক মার্কেট এসিস্ট্যান্ট। আমি আপনাকে বাংলাদেশ স্টক মার্কেটের তথ্য দিয়ে সহায়তা করতে পারি তবে বিশেষ করে শেয়ার প্রাইস।",
+            "introduction": "আমি একজন স্টক মার্কেট এসিস্ট্যান্ট। আমি আপনাকে বাংলাদেশ স্টক মার্কেটের তথ্য দিয়ে সহায়তা করতে পারি বিশেষ করে শেয়ার প্রাইস।",
             "irrelevant": "দয়াকরে বাংলাদেশ স্টক মার্কেট সম্পর্কে প্রশ্ন করুন বিশেষ করে শেয়ার প্রাইস।",
             "greetAsk": "হ্যা, সবকিছুই ভাল যাচ্ছে, ধন্যবাদ আপনাকে...",
             "fun": "হুম.. আমি বুঝতে পেরেছি তুমি আমার সাথে মজা করছ। এসব বাদ দিয়ে শেয়ার মার্কেটে মনোযোগ দাও, প্রয়োজনে আমার সহযোগিতা নাও।",
             "greet": "হ্যালো বন্ধু, আমি আপনাকে সাহায্য করতে সর্বদা প্রস্তুত-",
-            "nudity": "নগ্নতা এখানে অনুমোদিত নয়, দয়াকরে সংযত হোন।"
+            "nudity": "নগ্নতা এখানে অনুমোদিত নয়, দয়াকরে সংযত হোন।",
+            "shortcut": "আচ্চা...",
+            "neutral": "",
         },
         "intent": {
             "analysis": "আপাতত এই বিষয়ে আমার যথেষ্ট জ্ঞান নেই। এ বিষয়ে আমি শিখছি...",
@@ -22,15 +24,15 @@ RESPONSES = {
             "other": "আপাতত এই বিষয়ে আমার যথেষ্ট জ্ঞান নেই। দয়াকরে বাংলাদেশ স্টক মার্কেট সম্পর্কে স্পষ্ট প্রশ্ন করুন।",
         },
         "sharePrice": {
-            "volume": "{} এর volume হল-",
-            "ltp": "{} এর ltp হল-",
-            "value": "{} value হল-",
-            "ycp": "{} ycp হল-",
-            "maketDepth": "{} এর market depth হল-",
-            "all": "{} এর price সম্পর্কে বিস্তারিত হল-",
-            "marketDepth": "{} এর market depth হল-",
-            "price": "{} এর price সম্পর্কে তথ্য হল-",
-            "No": "{} এর সম্পর্কে আপনি কী জানতে চান, দয়াকরে স্পষ্টভাবে বলুন-",
+            "volume": "{se} তে {mt} মার্কেটে {tc} এর volume হল-",
+            "ltp": "{se} তে {mt} মার্কেটে {tc} এর ltp হল-",
+            "value": "{se} তে {mt} মার্কেটে {tc} এর value হল-",
+            "ycp": "{se} তে {mt} মার্কেটে {tc} এর  ycp হল-",
+            "maketDepth": "{se} তে {mt} মার্কেটে {tc} এর market depth হল-",
+            "all": "{se} তে {mt} মার্কেটে {tc} এর price সম্পর্কে বিস্তারিত হল-",
+            "marketDepth": "{se} তে {mt} মার্কেটে {tc} এর market depth হল-",
+            "price": "{se} তে {mt} মার্কেটে {tc} এর price সম্পর্কে তথ্য হল-",
+            "No": "{tc} এর সম্পর্কে আপনি কী জানতে চান, দয়াকরে স্পষ্টভাবে বলুন-",
         },
 
     },
@@ -41,12 +43,14 @@ RESPONSES = {
         "angry": "apnake sontushto korte na parar jonno dukhito; doyakore shanto hon. uttejito obosthay sothik siddhanto neoa kothin.",
         "bye": "apnake dhonnobad. kono proshno thakle porobortite janaben.",
         "appreciate": "apnake onek onek dhonnobad. ami vobisshote aro improv korar cheshta korbo.",
-        "introduction": "ami ekjon stock market assistant. ami apnake bangladesh stock market-er tottho diye sohayota korte pari tobe bishesh kore share price.",
+        "introduction": "ami ekjon stock market assistant. ami apnake bangladesh stock market-er tottho diye sohayota korte pari bishesh kore share price.",
         "irrelevant": "doyakore bangladesh stock market somporke proshno korun bishesh kore share price.",
         "greetAsk": "ha, sobkichu-i bhalo jacche, dhonnobad apnake...",
         "fun": "hum.. ami bujhte perechi tumi amar sathe moja korcho. eshob bad diye share market-e monojog dao, proyojone amar sohojogita nao.",
         "greet": "hello bondhu, ami apnake sahajjo korte shorboda prostut-",
-        "nudity": "nognota ekhane onumodito noy, doyakore songjoto hon."
+        "nudity": "nognota ekhane onumodito noy, doyakore songjoto hon.",
+        "shortcut": "accha...",
+        "neutral": "",
         },
         "intent": {
             "analysis": "apatoto ei bisoye amar jothesto gyan nei. ei bisoye ami shikhchi...",
@@ -56,15 +60,15 @@ RESPONSES = {
             "other": "apatoto ei bisoye amar jothesto gyan nei. doyakore bangladesh stock market somporke spostho proshno korun."
         },
         "sharePrice": {
-            "volume": "{} er volume hol-",
-            "ltp": "{} er ltp hol-",
-            "value": "{} value hol-",
-            "ycp": "{} ycp hol-",
-            "maketDepth": "{} er market depth hol-",
-            "all": "{} er price somporke bistariito hol-",
-            "marketDepth": "{} er market depth hol-",
-            "price": "{} er price somporke tottho hol-",
-            "No": "{} er somporke apni ki jante chan, doyakore spostho bhabe bolun-"
+            "volume": "{se} te {mt} market e {tc} er volume holo-",
+            "ltp": "{se} te {mt} market e {tc} er ltp holo-",
+            "value": "{se} te {mt} market e {tc} er value holo-",
+            "ycp": "{se} te {mt} market e {tc} er ycp holo-",
+            "maketDepth": "{se} te {mt} market e {tc} er market depth holo-",
+            "all": "{se} te {mt} market e {tc} er price somporke bistariito holo-",
+            "marketDepth": "{se} te {mt} market e {tc} er market depth holo-",
+            "price": "{se} te {mt} market e {tc} er price somporke tottho holo-",
+            "No": "{tc} er somporke apni ki jante chan, doyakore spostho bhabe bolun-"
         }
     },
 
@@ -79,7 +83,9 @@ RESPONSES = {
         "greetAsk": "Yes, everything is going well, thank you...",
         "fun": "Haha.. I see you are joking with me. Let's focus on the stock market, and feel free to ask for my help if needed.",
         "greet": "Hello friend, I am always ready to help you-",
-        "nudity": "Nudity is not allowed here, please be cautious."
+        "nudity": "Nudity is not allowed here, please be cautious.",
+        "shortcut": "absolutely...",
+        "neutral": "",
         },
         "intent": {
             "analysis": "I don't have enough knowledge on this topic yet. I'm still learning...",
@@ -89,15 +95,15 @@ RESPONSES = {
             "other": "I don't have enough knowledge on this topic yet. Please ask a clear question about the Bangladesh stock market."
         },
         "sharePrice": {
-            "volume": "{}'s volume is-",
-            "ltp": "{}'s LTP is-",
-            "value": "{}'s value is-",
-            "ycp": "{}'s YCP is-",
-            "maketDepth": "{}'s market depth is-",
-            "all": "Detailed price information for {} is-",
-            "marketDepth": "{}'s market depth is-",
-            "price": "Price information for {} is-",
-            "No": "What do you want to know about {}? Please specify clearly-"
+            "volume": "At {se} in {mt} market {tc}'s volume is-",
+            "ltp": "At {se} in {mt} market {tc}'s LTP is-",
+            "value": "At {se} in {mt} market {tc}'s value is-",
+            "ycp": "At {se} in {mt} market {tc}'s YCP is-",
+            "maketDepth": "At {se} in {mt} market {tc}'s market depth is-",
+            "all": "At {se} in {mt} market detailed price information for {tc} is-",
+            "marketDepth": "At {se} in {mt} market {tc}'s market depth is-",
+            "price": "At {se} in {mt} market price information for {tc} is-",
+            "No": "What do you want to know about {tc}? Please specify clearly-"
         }
     }    
 }

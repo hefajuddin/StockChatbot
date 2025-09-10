@@ -2,32 +2,119 @@
 from typing import List, Dict
 from app.responses import RESPONSES
 
-def build_general_response(language_label, sentiment_label, intent_label, priceStatus_label, arguments):
+# def build_general_response(language_label, sentiment_label, intent_label, priceStatus_label, arguments):
+#     """
+#     language_label, sentiment_label, intent_label, priceStatus_label অনুযায়ী
+#     generalResponse তৈরী করবে। 
+#     """
+#     generalResponse = []
+
+#     if language_label == "bn":
+#         # === Sentiment ===
+#         sentiment_text = RESPONSES["bn"]["sentiment"].get(sentiment_label)
+#         if sentiment_text:
+#             generalResponse.append(sentiment_text)
+
+#         # === Intent ===
+#         if intent_label == "sharePrice":
+#             trading_codes = arguments.get("trading_codes", [])
+#             template = RESPONSES["bn"]["sharePrice"].get(priceStatus_label)
+#             if template and trading_codes:
+#                 for tc in trading_codes:
+#                     generalResponse.append(template.format(tc))
+#         else:
+#             intent_text = RESPONSES["bn"]["intent"].get(intent_label)
+#             if intent_text:
+#                 generalResponse.append(intent_text)
+
+#     return generalResponse
+
+
+
+# def build_general_response(language_label, sentiment_label, intent_label, priceStatus_label, arguments, combos):
+#     """
+#     language_label, sentiment_label, intent_label, priceStatus_label অনুযায়ী
+#     generalResponse তৈরী করবে। 
+#     """
+#     generalResponse = []
+
+#     print("mmmmmmmmmmmmmmmmmmmmmmmmmm", arguments)
+
+#     # language_label সাপোর্ট না করলে default 'bn'
+#     lang_responses = RESPONSES.get(language_label, RESPONSES.get("bn", {}))
+
+#     # === Sentiment ===
+#     sentiment_text = lang_responses.get("sentiment", {}).get(sentiment_label)
+#     if sentiment_text:
+#         generalResponse.append(sentiment_text)
+
+#     # === Intent ===
+#     if intent_label == "sharePrice":
+#         trading_codes = arguments.get("trading_codes", [])
+
+#         template = lang_responses.get("sharePrice", {}).get(priceStatus_label)
+#         if template and trading_codes:
+
+#             # helper ফাংশন: যদি ভ্যালু লিস্ট হয় তাহলে প্রথম এলিমেন্ট নেবে
+#             def normalize(value, default):
+#                 if isinstance(value, list) and value:
+#                     return value[0]
+#                 return value if value else default
+
+#             for tc in trading_codes:
+#                 values = {
+#                     "se": normalize(arguments.get("stock_exchange"), "dse"),
+#                     "mt": normalize(arguments.get("market_type"), "public"),
+#                     "tc": tc.lower()  # trading_code lowercase করলে সুন্দর দেখাবে
+#                 }
+#                 generalResponse.append(template.format(**values))
+
+#     else:
+#         intent_text = lang_responses.get("intent", {}).get(intent_label)
+#         if intent_text:
+#             generalResponse.append(intent_text)
+
+#     return generalResponse
+
+
+
+
+def build_general_response(language_label, sentiment_label, intent_label, priceStatus_label, arguments, combos):
     """
     language_label, sentiment_label, intent_label, priceStatus_label অনুযায়ী
-    generalResponse তৈরী করবে। 
+    generalResponse তৈরী করবে। RESPONSES থেকে টেমপ্লেট নিয়ে।
     """
     generalResponse = []
 
-    if language_label == "bn":
-        # === Sentiment ===
-        sentiment_text = RESPONSES["bn"]["sentiment"].get(sentiment_label)
-        if sentiment_text:
-            generalResponse.append(sentiment_text)
+    # language_label সাপোর্ট না করলে default 'bn'
+    lang_responses = RESPONSES.get(language_label, RESPONSES.get("bn", {}))
 
-        # === Intent ===
-        if intent_label == "sharePrice":
-            trading_codes = arguments.get("trading_codes", [])
-            template = RESPONSES["bn"]["sharePrice"].get(priceStatus_label)
-            if template and trading_codes:
-                for tc in trading_codes:
-                    generalResponse.append(template.format(tc))
-        else:
-            intent_text = RESPONSES["bn"]["intent"].get(intent_label)
-            if intent_text:
-                generalResponse.append(intent_text)
+    # === Sentiment ===
+    sentiment_text = lang_responses.get("sentiment", {}).get(sentiment_label)
+    if sentiment_text:
+        generalResponse.append(sentiment_text)
+
+    # === Intent ===
+    if intent_label == "sharePrice":
+        template = lang_responses.get("sharePrice", {}).get(priceStatus_label)
+        if template and combos:
+            for se, mt, tc in combos:
+                values = {
+                    "se": se or "dse",
+                    "mt": mt or "public",
+                    "tc": tc.lower() if tc else ""
+                }
+                generalResponse.append(template.format(**values))
+    else:
+        intent_text = lang_responses.get("intent", {}).get(intent_label)
+        if intent_text:
+            generalResponse.append(intent_text)
 
     return generalResponse
+
+
+
+
 
 def filter_market_depths(market_depths: List[dict], generalResponse: List[str], status=None) -> List[dict]:
     if not market_depths:
