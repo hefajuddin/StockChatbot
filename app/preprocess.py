@@ -27,23 +27,23 @@ trading_codes_mapping_bangla2english = {
     "UNIONBANK": ["ইউনিয়নব্যাংক"],
     "UNILEVERCL": ["ইউনিলিভারসিএল"],
     "UCB": ["ইউসিবি"],
-    "TUNGHAI": ["টাংহাই"],
+    "TUNGHAI": ["টাংহাই", "টাুংহাই", "ঠুংহাই", "ঠুঙ্গাই", "ঠংহাই", "ঠাুংহাই"],
     "TRUSTBANK": ["ট্রাস্টব্যাংক"],
     "TRUSTB1MF": ["ট্রাস্টবিফার্স্টএমএফ"],
-    "TOSRIFA": ["তোসরিফা"],
+    "TOSRIFA": ["তোসরিফা", "তসরিফা"],
     "TITASGAS": ["টাইটাসগ্যাস"],
-    "TILIL": ["টিলিল"],
+    "TILIL": ["টিলিল", "টাইটিল"],
     "TECHNODRUG": ["টেকনোড্রাগ"],
-    "TB5Y0630": ["টিবি৫ও৬৩০"],
+    "TB5Y0630": ["টিবি৫ওয়াই৬৩০", "টিবি5Y0630", "টিবি৫ওয়াই০৬৩০", "টিবি5ওয়াই০৬৩০"],
     "TB5Y0529": ["টিবি৫ও৫২৯"],
     "TB2Y0826": ["টিবি২ও৮২৬"],
     "TAMIJTEX": ["তামিজটেক্স"],
-    "TALLUSPIN": ["টাল্লাসপিন"],
-    "TAKAFULINS": ["তাকাফুলইনস"],
-    "SUNLIFEINS": ["সানলাইফইনস"],
-    "SUMITPOWER": ["সুমিটপাওয়ার"],
+    "TALLUSPIN": ["টাল্লাসপিন", "তুল্লুস্পিন"],
+    "TAKAFULINS": ["তাকাফুলইনস", "তাকাফুলইন্স্যুরেন্স"],
+    "SUNLIFEINS": ["সানলাইফইনস", "সানলাইফইন্স্যুরেন্স"],
+    "SUMITPOWER": ["সুমিটপাওয়ার", "সামিটপাওয়ার"],
     "STYLECRAFT": ["স্টাইলক্রাফট"],
-    "STANDBANKL": ["স্ট্যান্ডব্যাংকলিমিটেড", "স্ট্যান্ডব্যাংকলি"],
+    "STANDBANKL": ["স্ট্যান্ডব্যাংকলিমিটেড", "স্ট্যান্ডার্ডব্যাংক"],
     "STANDARINS": ["স্ট্যান্ডারইনস", "স্ট্যান্ডারইন্স্যুরেন্স"],
     "STANCERAM": ["স্ট্যানসেরাম"],
     "SSSTEEL": ["এসএসস্টীল"],
@@ -67,7 +67,7 @@ trading_codes_mapping_bangla2english = {
     "SICL": ["এসআইসিএল"],
     "SIBL": ["এসআইবিএল"],
     "SHYAMPSUG": ["শ্যামপসুগ"],
-    "SHURWID": ["শুরিদ"],
+    "SHURWID": ["শুরিদ", "সুরিদ"],
     "SHEPHERD": ["শেফার্ড"],
     "SHASHADNIM": ["শাশাডেনিম"],
     "SHARPIND": ["শার্পইন্ড"],
@@ -116,22 +116,22 @@ trading_codes_mapping_bangla2english = {
     "PROGRESLIF": ["প্রগ্রেসলাইফ"],
     "PRIMETEX": ["প্রাইমটেক্স"],
     "PRIMELIFE": ["প্রাইমলাইফ"],
-    "PRIMEINSUR": ["প্রাইমইনসুর"],
+    "PRIMEINSUR": ["প্রাইমইনসুর", "প্রাইমইন্স্যুরেন্স"],
     "PRIMEFIN": ["প্রাইমফিন"],
     "PRIMEBANK": ["প্রাইমব্যাংক"],
     "PRIME1ICBA": ["প্রাইম১আইসিবিএ"],
     "PREMIERLEA": ["প্রিমিয়ারলী"],
-    "PREMIERCEM": ["প্রিমিয়ারসিম"],
+    "PREMIERCEM": ["প্রিমিয়ারসিম", "প্রিমিয়ারসিমেন্ট"],
     "PREMIERBAN": ["প্রিমিয়ারব্যাংক"],
     "PRAGATILIF": ["প্রগাতিলাইফ"],
-    "PRAGATIINS": ["প্রগাতিইনস"],
+    "PRAGATIINS": ["প্রগাতিইনস", "প্রগাতিইন্স্যুরেন্স"],
     "POWERGRID": ["পাওয়ারগ্রিড"],
     "POPULARLIF": ["পপুলারলাইফ"],
     "POPULAR1MF": ["পপুলার১এমএফ"],
     "PLFSL": ["পিএলএফএসএল"],
     "PIONEERINS": ["পায়োনিয়ারইনস"],
     "PHPMF1": ["পিএইচপিএমএফ১"],
-    "PHOENIXFIN": ["ফিনিক্সফিন"],
+    "PHOENIXFIN": ["ফিনিক্সফিন", "ফনিক্সফিন"],
     "PHENIXINS": ["ফেনিক্সইনস"],
     "PHARMAID": ["ফার্মাএইড"],
     "PF1STMF": ["পিএফ১স্টএমএফ"],
@@ -166,7 +166,7 @@ trading_codes_mapping_bangla2english = {
     "NAVANAPHAR": ["নাভানাফার"],
     "NAVANACNG": ["নাভানাসিএনজি"],
     "NATLIFEINS": ["ন্যাটলাইফইনস"],
-    "NAHEEACP": ["নাহীএকেপি"],
+    "NAHEEACP": ["নাহীএসিপি", "নাহী"],
     "MTB": ["এমটিবি"],
     "MPETROLEUM": ["এমপেট্রোলিয়াম"],
     "MOSTFAMETL": ["মোস্টফ্যামেটাল"],
@@ -200,33 +200,33 @@ trading_codes_mapping_bangla2english = {
     "MAGURAPLEX": ["মাগুরাপ্লেক্স"],
     "LRGLOBMF1": ["এলআরজিএলওবিএমএফ১"],
     "LRBDL": ["এলআরবিডিএল"],
-    "LOVELLO": ["লাভেল্লো"],
+    "LOVELLO": ["লাভেল্লো", "লোভেল্লো"],
     "LINDEBD": ["লিন্ডাবিডি", "লিনডাবিডি"],
     "LIBRAINFU": ["লাইব্রাইনফু", "লিব্রাইনফু"],
     "LHB": ["এলএইচবি"],
-    "LEGACYFOOT": ["লিগ্যাসিফুট"],
-    "LANKABAFIN": ["লঙ্কাবাফিন"],
+    "LEGACYFOOT": ["লিগ্যাসিফুট", "লেগ্যাসিফুট"],
+    "LANKABAFIN": ["লঙ্কাবাংলাফিন", "লঙ্কাবাংলা", "লংকাবাংলাফিন","লংকাবাংলা"],
     "KTL": ["কেটিএল"],
     "KPPL": ["কেপিপিএল"],
     "KPCL": ["কেপিসিএল"],
-    "KOHINOOR": ["কোহিনূর"],
+    "KOHINOOR": ["কোহিনূর", "কহিনুর"],
     "KFL": ["কেএফএল"],
-    "KEYACOSMET": ["কেয়াকসমেট"],
-    "KDSALTD": ["কেডিএসআল্টডি"],
-    "KBSEED": ["কেবিএসইডি"],
-    "KBPPWBIL": ["কেবিপিপিডব্লুবিল"],
-    "KAY&QUE": ["কেইএন্ডকিউ"],
+    "KEYACOSMET": ["কেয়াকসমেট", "কেয়াকসমেটিক"],
+    "KDSALTD": ["কেডিএসএক্সেসোরিস লিমিটেড", "কেডিএসএলিমিটেড"],
+    "KBSEED": ["কেবিসীড"],
+    "KBPPWBIL": ["কেবিপিপিডব্লুবিআইএল"],
+    "KAY&QUE": ["কেইএন্ডকিউ""কে&কিউ"],
     "KARNAPHULI": ["কার্ণফুলী"],
     "JUTESPINN": ["জুটস্পিন"],
-    "JMISMDL": ["জেমিসিএমডিএল"],
+    "JMISMDL": ["জেএমআইএসএমডিএল"],
     "JHRML": ["জেএইচআরএমএল"],
-    "JANATAINS": ["জনাতাঈনস"],
-    "JAMUNAOIL": ["জামুনা অয়েল"],
-    "JAMUNABANK": ["জামুনাব্যাংক"],
+    "JANATAINS": ["জনাতাইনস", "জনাতাইন্স্যুরেন্স"],
+    "JAMUNAOIL": ["যমুনাঅয়েল"],
+    "JAMUNABANK": ["যমুনাব্যাংক"],
     "ITC": ["আইটিসি"],
     "ISNLTD": ["আইএসএনলিমিটেড"],
-    "ISLAMIINS": ["ইসলামী ইনস"],
-    "ISLAMICFIN": ["ইসলামিকফিন"],
+    "ISLAMIINS": ["ইসলামীইনস", "ইসলামীইন্স্যুরেন্স"],
+    "ISLAMICFIN": ["ইসলামিকফিন", "ইসলামিকফিন্যান্স", "ইসলামিকফাইন্যান্স"],
     "ISLAMIBANK": ["ইসলামিব্যাংক"],
     "IPDC": ["আইপিডিসি"],
     "INTRACO": ["ইনট্রাকো"],
@@ -246,8 +246,8 @@ trading_codes_mapping_bangla2english = {
     "ICBAGRANI1": ["আইসিবিএগ্রাণী১"],
     "ICB3RDNRB": ["আইসিবিএ৩আরডিএনআরবি"],
     "ICB": ["আইসিবি"],
-    "IBP": ["আইবিআইপি"],
-    "IBNSINA": ["আইবিএনসিনা"],
+    "IBP": ["আইবিপি"],
+    "IBNSINA": ["ইবনেসিনা"],
     "HWAWELLTEX": ["এইচডব্লিউএওওয়েলটেক্স"],
     "HRTEX": ["এইচআরটেক্স"],
     "HIMADRI": ["হিমাদ্রি"],
@@ -422,15 +422,13 @@ trading_codes_mapping_bangla2english = {
 
 trading_market_types_bangla2english={
     "BLOCK": ["ব্লক"],
-    "PUBLIC": ["পাবলিক"],
+    "PUBLIC": ["পাবলিক", "পাব্লিক"],
 }
 
 trading_stock_exchanges_bangla2english={
     "DSE": ["ডিএসই"],
     "CSE": ["সিএসই"]    
 }
-
-
 
 suffix_map = {
     "ের": " এর", "ে": " এ", "র": " এর", "টি": " টি",
@@ -476,47 +474,63 @@ def phonetic_variants(word, phonetic_map):
         variants |= new_variants
     return variants
 
-def convert_word(word, mapping, suffix_map, cutoff=80):
-    word = normalize_unicode(word)
 
-    # ---------------- Suffix Handling ----------------
+def convert_word(word, mapping, suffix_map, cutoff: int = 80):
+    """
+    Bangla শব্দকে English mapping-এ কনভার্ট করে।
+    - word: একক শব্দ (ধরে নেওয়া হচ্ছে NFC normalized)
+    - mapping: Bangla->English mapping dict
+    - suffix_map: suffix হ্যান্ডলিং
+    - cutoff: fuzzy match similarity থ্রেশহোল্ড
+    """
+
+    # === precompute সব বাংলা ভ্যালু একবারে ===
+    all_bangla = [b for bl in mapping.values() for b in bl]
+    print("convertwwwwwwwwwwww||wwwwwwwNoword", word)
+    word = normalize_unicode(word)
+    print("convertwwwwwwwwwwww||wwwwwwword", word)
+    # ---------- 1️⃣ Suffix Handling ----------
     for suf in sorted(suffix_map.keys(), key=len, reverse=True):
         if word.endswith(suf):
             core = word[:-len(suf)]
             variants = phonetic_variants(core, phonetic_map)
-            # Check exact mapping
+
+            # exact match
             for eng, bn_list in mapping.items():
                 if any(v in bn_list for v in variants):
                     return eng + suffix_map[suf]
-            # Fuzzy match
-            all_bangla = [b for bl in mapping.values() for b in bl]
+
+            # fuzzy match (core অংশের জন্য)
             match_score = process.extractOne(core, all_bangla, scorer=fuzz.ratio)
             if match_score:
-                match, score = match_score[0], match_score[1]
+                match, score, _ = match_score   # index উপেক্ষা কর
                 if score >= cutoff:
                     for eng, bn_list in mapping.items():
                         if match in bn_list:
                             return eng + suffix_map[suf]
-            break  # Only apply one suffix
+            break  # একবার suffix মিলে গেলে break
 
-    # ---------------- Direct Match ----------------
+    # ---------- 2️⃣ Direct Match ----------
     variants = phonetic_variants(word, phonetic_map)
     for eng, bn_list in mapping.items():
         if any(v in bn_list for v in variants):
             return eng
 
-    # ---------------- Fuzzy Full Word ----------------
-    all_bangla = [b for bl in mapping.values() for b in bl]
+    # ---------- 3️⃣ Fuzzy Full Word ----------
     match_score = process.extractOne(word, all_bangla, scorer=fuzz.ratio)
     if match_score:
-        match, score = match_score[0], match_score[1]
+        match, score, _ = match_score
         if score >= cutoff:
             for eng, bn_list in mapping.items():
                 if match in bn_list:
                     return eng
 
-    # No match, return original word
+    # ---------- 4️⃣ No Match ----------
+    print("DEBUG: no mapping found for", word)
     return word
+
+
+
 
 bangla2english_mapping = {
     **trading_codes_mapping_bangla2english,
@@ -526,6 +540,7 @@ bangla2english_mapping = {
 
 def convert_sentence(text):
     words = text.split()
+    print("convertssssssssssppppppppppppppppppp", " ".join(convert_word(w, bangla2english_mapping , suffix_map) for w in words))
     return " ".join(convert_word(w, bangla2english_mapping , suffix_map) for w in words)
 
 
@@ -535,11 +550,11 @@ import unicodedata
 from html import unescape
 # ---- Preprocess text ----
 def preprocess(text, remove_repetition=True):
-
     text = convert_sentence(text)
-
     text = text.lower()  # lowercase all English
-    text = unicodedata.normalize("NFC", text)
+    print("preprocessssssssssssssssssss lower", text)
+    # text = unicodedata.normalize("NFC", text)
+    print("preprocessssssssssssssssssss nfc", text)
     text = unescape(text)
     
     # Remove HTML tags
@@ -600,12 +615,7 @@ def prepare_text_for_infer(raw_text: str) -> str:
     clean = preprocess(raw_text)
 
     # entity-safe tokenization (কমা, স্টককোড, এক্সচেঞ্জ, সব ঠিক মতো ভাঙবে)
-    tokens = tokenize_protect_entities(
-        clean,
-        trading_codes,
-        market_types,
-        stock_exchanges
-    )
+    tokens = tokenize_protect_entities(clean, trading_codes, market_types, stock_exchanges)
 
     # HF tokenizer এর আগে train এর মত space-separated string বানাও
     return " ".join(tokens).lower()

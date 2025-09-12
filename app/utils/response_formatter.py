@@ -114,8 +114,6 @@ def build_general_response(language_label, sentiment_label, intent_label, priceS
 
 
 
-
-
 def filter_market_depths(market_depths: List[dict], generalResponse: List[str], status=None) -> List[dict]:
     if not market_depths:
         return []   # follow-up case → just return empty list
