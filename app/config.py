@@ -1,4 +1,5 @@
-BASE_OMS_URL = "https://puji.fcslbd.com:20121/api"
+# BASE_OMS_URL = "https://puji.fcslbd.com:20121/api"
+BASE_OMS_URL = "https://prod-oms-api-1.xfltrade.com:20121/api"
 
 # Device / Auth config (যদি দরকার হয়)
 LOGIN_ENDPOINT = f"{BASE_OMS_URL}/Login"

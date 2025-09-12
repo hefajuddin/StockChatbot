@@ -8,7 +8,7 @@ import itertools
 
 from app.model import model, tokenizer
 from app.modelSource import DEVICE, label_maps
-from app.preprocess import convert_sentence, bangla_to_english, suffix_map
+from app.preprocess import prepare_text_for_infer
 from app.decode import decode_ner_confident, get_label
 from app.config import LOGIN_ENDPOINT, SHAREPRICE_ENDPOINT, PORTFOLIO_ENDPOINT, BALANCE_ENDPOINT
 from app.utils.response_formatter import build_general_response, filter_market_depths
@@ -69,6 +69,10 @@ def get_current_token(credentials: HTTPAuthorizationCredentials = Security(beare
     return token
 
 # ================== INFERENCE ==================
+
+
+
+
 @app.post("/predict_batch", response_model=APIResponseSimple, tags=["Prediction"])
 async def predict_batch(request: APIRequest, token: str = Depends(get_current_token)):
     if not request.inputs:
@@ -81,10 +85,19 @@ async def predict_batch(request: APIRequest, token: str = Depends(get_current_to
     return {"results": results}
 
 
+
+
+
+
 async def infer_batch(text_list: List[str], token: str) -> List[dict]:
-    texts = [str(convert_sentence(t, bangla_to_english, suffix_map)).lower() for t in text_list]
+    # ---- preprocess + tokenize just like training ----
+    texts = [prepare_text_for_infer(t) for t in text_list]
+    print("preprocessed texts:", texts)
+
     inputs = tokenizer(texts, return_tensors="pt", padding=True, truncation=True, max_length=64)
+    print("inputtttttttttsssssss", inputs)
     inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
+    print("inputttttttttts deviceeeeeeeeeeee", inputs)
 
     with torch.no_grad():
         logits = model(**inputs)

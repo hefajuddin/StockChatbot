@@ -141,16 +141,23 @@ def filter_market_depths(market_depths: List[dict], generalResponse: List[str], 
         selected = {}
 
         keys_to_check = [status] if status else keyword_map.keys()
+        print("a", keys_to_check)
+
+        if keys_to_check == ["No"]:
+            return []
+
 
         for key in keys_to_check:
             fields = keyword_map.get(key, [])
             for f in fields:
                 if f in data:
                     selected[f] = data[f]
+                    print("b", f, data[f])
 
         if selected:
             filtered.append(selected)
         else:
             filtered.append(data)
 
+    print("c", filtered)
     return filtered

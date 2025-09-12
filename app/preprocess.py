@@ -2,7 +2,7 @@ import unicodedata
 from rapidfuzz import process, fuzz
 
 # ===================== Mappings =====================
-bangla_to_english = {
+trading_codes_mapping_bangla2english = {
 "ZAHINTEX": ["যাহিনটেক্স"],
     "ZAHEENSPIN": ["জাহিনস্পিন"],
     "YUSUFLOUR": ["ইউসুফফ্লাওয়ার", "ইউসুফফ্লাওয়ার্স"],
@@ -418,11 +418,19 @@ bangla_to_english = {
     "AAMRANET": ["আমরানেট"],
     "1STPRIMFMF": ["১স্টপ্রাইমএমএফ","ফার্স্টপ্রাইমএমএফ"],
     "1JANATAMF": ["১জনতাএমএফ","ফার্স্টজনতাএমএফ"],
+}
+
+trading_market_types_bangla2english={
     "BLOCK": ["ব্লক"],
     "PUBLIC": ["পাবলিক"],
+}
+
+trading_stock_exchanges_bangla2english={
     "DSE": ["ডিএসই"],
     "CSE": ["সিএসই"]    
 }
+
+
 
 suffix_map = {
     "ের": " এর", "ে": " এ", "র": " এর", "টি": " টি",
@@ -510,6 +518,94 @@ def convert_word(word, mapping, suffix_map, cutoff=80):
     # No match, return original word
     return word
 
-def convert_sentence(text, mapping=bangla_to_english, suffix_map=suffix_map):
+bangla2english_mapping = {
+    **trading_codes_mapping_bangla2english,
+    **trading_market_types_bangla2english,
+    **trading_stock_exchanges_bangla2english
+}
+
+def convert_sentence(text):
     words = text.split()
-    return " ".join(convert_word(w, mapping, suffix_map) for w in words)
+    return " ".join(convert_word(w, bangla2english_mapping , suffix_map) for w in words)
+
+
+import re
+import random
+import unicodedata
+from html import unescape
+# ---- Preprocess text ----
+def preprocess(text, remove_repetition=True):
+
+    text = convert_sentence(text)
+
+    text = text.lower()  # lowercase all English
+    text = unicodedata.normalize("NFC", text)
+    text = unescape(text)
+    
+    # Remove HTML tags
+    text = re.sub(r'<[^>]+>', ' ', text)
+    
+    # Remove commas inside numbers
+    text = re.sub(r'(?<=\d),(?=\d)', '', text)  # English numbers
+    text = re.sub(r'(?<=\u09E6|\d),(?=\u09E6|\d)', '', text)  # Bengali numbers
+    
+    # Remove extra spaces
+    text = re.sub(r'\s+', ' ', text).strip()
+    
+    if remove_repetition:
+        # Reduce repeated letters/punctuations to a single occurrence
+        text = re.sub(r'(.)\1+', r'\1', text)
+    
+    print("processsssssss", text)
+    return text
+
+
+trading_codes = list(trading_codes_mapping_bangla2english.keys())
+market_types = list(trading_market_types_bangla2english.keys())
+stock_exchanges = list(trading_stock_exchanges_bangla2english.keys())
+
+# ---- Tokenize while preserving multi-word / special char entities ----
+def tokenize_protect_entities(text, trading_codes, market_types, stock_exchanges):
+    """
+    Tokenize text while preserving multi-word / special-character entities.
+    Assumes text is already preprocessed and lowercase.
+    """
+    # Protect all entities with placeholders
+    entity_map = {}
+    all_entities = trading_codes + market_types + stock_exchanges
+    for i, ent in enumerate(all_entities):
+        placeholder = f"__ENTITY_{i}__"
+        # replace all case-insensitive occurrences
+        text = re.sub(re.escape(ent), placeholder, text, flags=re.IGNORECASE)
+        entity_map[placeholder] = ent.lower()  # store lowercase entity
+
+    # Tokenize including placeholders
+    pattern = r'[০-৯0-9]+|[\u0980-\u09FF]+|[A-Za-z]+|[^\s\w\u0980-\u09FF]|__ENTITY_\d+__'
+    tokens = re.findall(pattern, text)
+
+    # Replace placeholders back with original entity
+    tokens = [entity_map.get(t, t) for t in tokens]
+    print("tokenizeeeeeeeeeee", tokens)
+
+    return tokens
+
+
+    # === inference utility ===
+def prepare_text_for_infer(raw_text: str) -> str:
+    """
+    Training এর মতোই preprocess + tokenize_protect_entities চালিয়ে
+    space-separated string ফেরত দেবে।
+    """
+    # preprocess (HTML, comma inside number, lower, ইত্যাদি)
+    clean = preprocess(raw_text)
+
+    # entity-safe tokenization (কমা, স্টককোড, এক্সচেঞ্জ, সব ঠিক মতো ভাঙবে)
+    tokens = tokenize_protect_entities(
+        clean,
+        trading_codes,
+        market_types,
+        stock_exchanges
+    )
+
+    # HF tokenizer এর আগে train এর মত space-separated string বানাও
+    return " ".join(tokens).lower()
