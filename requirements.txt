@@ -6,4 +6,5 @@ safetensors
 rapidfuzz
 pydantic
 httpx
-
+redis
+"python-jose[cryptography]" 

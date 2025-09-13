@@ -2,7 +2,7 @@
 from typing import List, Dict
 from app.responses import RESPONSES
 
-def build_general_response(language_label, sentiment_label, intent_label, priceStatus_label, arguments, combos):
+def build_general_response(language_label, sentiment_label, intent_label, priceStatus_label, combos):
     """
     language_label, sentiment_label, intent_label, priceStatus_label অনুযায়ী
     generalResponse তৈরী করবে। RESPONSES থেকে টেমপ্লেট নিয়ে।
