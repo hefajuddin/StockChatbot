@@ -43,6 +43,7 @@ class APIResponseItemSimple(BaseModel):
 class APIResponseSimple(BaseModel):
     results: List[APIResponseItemSimple]
 
+
 # ================== LOGIN ==================
 @app.post("/login", response_model=LoginResponse, tags=["Authentication"])
 async def login(request: LoginRequest):
@@ -58,6 +59,7 @@ async def login(request: LoginRequest):
     auth_token = token
     return {"token": token}
 
+
 # ================== DEPENDENCY ==================
 def get_current_token(credentials: HTTPAuthorizationCredentials = Security(bearer_scheme)):
     global auth_token
@@ -68,11 +70,8 @@ def get_current_token(credentials: HTTPAuthorizationCredentials = Security(beare
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     return token
 
+
 # ================== INFERENCE ==================
-
-
-
-
 @app.post("/predict_batch", response_model=APIResponseSimple, tags=["Prediction"])
 async def predict_batch(request: APIRequest, token: str = Depends(get_current_token)):
     if not request.inputs:
@@ -85,19 +84,11 @@ async def predict_batch(request: APIRequest, token: str = Depends(get_current_to
     return {"results": results}
 
 
-
-
-
-
 async def infer_batch(text_list: List[str], token: str) -> List[dict]:
     # ---- preprocess + tokenize just like training ----
     texts = [prepare_text_for_infer(t) for t in text_list]
-    print("preprocessed texts:", texts)
-
     inputs = tokenizer(texts, return_tensors="pt", padding=True, truncation=True, max_length=64)
-    print("inputtttttttttsssssss", inputs)
     inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
-    print("inputttttttttts deviceeeeeeeeeeee", inputs)
 
     with torch.no_grad():
         logits = model(**inputs)
@@ -122,19 +113,6 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
         language_label = get_label(language_logits, label_maps["language_label2id"])
         context_label = get_label(context_logits, label_maps["context_label2id"])
 
-
-        print("nerrrrrrrrrrrrrrrrr", intent_label)
-        print("nerrrrrrrrrrrrrrrrr", sentiment_label)
-        print("nerrrrrrrrrrrrrrrrr", priceStatus_label)
-        print("nerrrrrrrrrrrrrrrrr", language_label)
-        print("nerrrrrrrrrrrrrrrrr", context_label)
-        print("nerrrrrrrrrrrrrrrrr", context_label)
-
-        print("nnnnnnnnnnnnnnnnnnn", arguments)
-
-
-
-
         # === Endpoint Mapping ===
         if intent_label == 'sharePrice':
             endpoint = SHAREPRICE_ENDPOINT
@@ -153,9 +131,7 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
             arguments["trading_codes"] or []
         ))
 
-        print("oooooooooooooooooooooooooo", combos)
-
-        # === API Call (only if trading_codes exist) ===
+         # === API Call (only if trading_codes exist) ===
         if endpoint and arguments["trading_codes"]:
             async with httpx.AsyncClient() as client:
                 for se, mt, tc in combos:
@@ -181,13 +157,13 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
             language_label, sentiment_label, intent_label, priceStatus_label, arguments, combos
         )
 
-        # === Special Case: price_status, se, mt আছে কিন্তু trading_code নাই ===
-        if intent_label == "sharePrice" and priceStatus_label and (arguments["marketType"] or arguments["stockExchange"]) and not arguments["trading_codes"]:
-            generalResponse.append("Please provide the TradingCode/Item properly to get expected response.")
+        # # === Special Case: price_status, se, mt আছে কিন্তু trading_code নাই ===
+        # if intent_label == "sharePrice" and priceStatus_label and (arguments["marketType"] or arguments["stockExchange"]) and not arguments["trading_codes"]:
+        #     generalResponse.append("Please provide the TradingCode/Item properly to get expected response.")
 
-        # === If nothing found but still a valid follow-up ===
-        if not generalResponse:
-            generalResponse.append("I need a bit more detail to assist you properly. Could you clarify?")
+        # # === If nothing found but still a valid follow-up ===
+        # if not generalResponse:
+        #     generalResponse.append("I need a bit more detail to assist you properly. Could you clarify?")
 
         # === Filter market depths (if any) ===
         filtered_depths = filter_market_depths(market_depths, generalResponse, priceStatus_label)
