@@ -114,8 +114,8 @@ def build_general_response(language_label, sentiment_label, intent_label, priceS
 
 
 
-def filter_market_depths(market_depths: List[dict], generalResponse: List[str], status=None) -> List[dict]:
-    if not market_depths:
+def filter_priceList(priceList: List[dict], generalResponse: List[str], status=None) -> List[dict]:
+    if not priceList:
         return []   # follow-up case → just return empty list
 
     if not generalResponse:
@@ -134,7 +134,7 @@ def filter_market_depths(market_depths: List[dict], generalResponse: List[str], 
     }
 
     filtered = []
-    for depth in market_depths:
+    for depth in priceList:
         data = depth.get("data", {})
         selected = {}
 

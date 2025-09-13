@@ -11,7 +11,7 @@ from app.modelSource import DEVICE, label_maps
 from app.preprocess import prepare_text_for_infer
 from app.decode import decode_ner_confident, get_label
 from app.config import LOGIN_ENDPOINT, SHAREPRICE_ENDPOINT, PORTFOLIO_ENDPOINT, BALANCE_ENDPOINT
-from app.utils.response_formatter import build_general_response, filter_market_depths
+from app.utils.response_formatter import build_general_response, filter_priceList
 
 # ================== CONFIG ==================
 auth_token: str | None = None  # global token storage
@@ -38,7 +38,7 @@ class APIRequest(BaseModel):
 
 class APIResponseItemSimple(BaseModel):
     results: dict  # শুধু generalResponse রাখব
-    market_depths: List[dict]
+    priceList: List[dict]
 
 class APIResponseSimple(BaseModel):
     results: List[APIResponseItemSimple]
@@ -123,7 +123,7 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
         else:
             endpoint = None
 
-        market_depths = []
+        priceList = []
         headers = {"Authorization": f"Bearer {token}"}
         combos = list(itertools.product(
             arguments["stockExchange"] or ["dse"],
@@ -139,15 +139,15 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
                     try:
                         resp = await client.get(url, headers=headers)
                         if resp.status_code == 200:
-                            market_depths.append(resp.json())
+                            priceList.append(resp.json())
                         else:
-                            market_depths.append({
+                            priceList.append({
                                 "error": f"API returned {resp.status_code}",
                                 "details": resp.text,
                                 "text": text
                             })
                     except Exception as e:
-                        market_depths.append({
+                        priceList.append({
                             "error": str(e),
                             "text": text
                         })
@@ -166,7 +166,7 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
         #     generalResponse.append("I need a bit more detail to assist you properly. Could you clarify?")
 
         # === Filter market depths (if any) ===
-        filtered_depths = filter_market_depths(market_depths, generalResponse, priceStatus_label)
+        filtered_depths = filter_priceList(priceList, generalResponse, priceStatus_label)
 
         results.append({
             "results": {
@@ -179,7 +179,7 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
                 "generalResponse": generalResponse,
                 "inputText": text
             },
-            "market_depths": filtered_depths
+            "priceList": filtered_depths
         })
 
     return results
