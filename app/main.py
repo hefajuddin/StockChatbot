@@ -106,7 +106,10 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
             "marketType": [item["text"] for item in ner_result if "marketType" in item["tag"]],
             "stockExchange": [item["text"] for item in ner_result if "stockExchange" in item["tag"]],
         }
-
+        
+        tradingCodes = arguments["trading_codes"]
+        marketTypes = arguments["marketType"]
+        stockExchanges = arguments["stockExchange"]
         intent_label = get_label(intent_logits, label_maps["intent_label2id"])
         sentiment_label = get_label(sentiment_logits, label_maps["sentiment_label2id"])
         priceStatus_label = get_label(priceStatus_logits, label_maps["priceStatus_label2id"])
@@ -170,8 +173,10 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
 
         results.append({
             "results": {
+                "tradingCodes": tradingCodes,
+                "marketTypes": marketTypes,
+                "stockExchanges": stockExchanges,
                 "intent": intent_label,
-                "arguments": arguments,
                 "sentiment": sentiment_label,
                 "language": language_label,
                 "status": priceStatus_label,
