@@ -160,6 +160,8 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
             language_label, sentiment_label, intent_label, priceStatus_label, arguments, combos
         )
 
+
+
         # # === Special Case: price_status, se, mt আছে কিন্তু trading_code নাই ===
         # if intent_label == "sharePrice" and priceStatus_label and (arguments["marketType"] or arguments["stockExchange"]) and not arguments["trading_codes"]:
         #     generalResponse.append("Please provide the TradingCode/Item properly to get expected response.")
@@ -169,7 +171,7 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
         #     generalResponse.append("I need a bit more detail to assist you properly. Could you clarify?")
 
         # === Filter market depths (if any) ===
-        filtered_depths = filter_priceList(priceList, generalResponse, priceStatus_label)
+        filtered_prices = filter_priceList(priceList, generalResponse, priceStatus_label)
 
         results.append({
             "results": {
@@ -184,7 +186,7 @@ async def infer_batch(text_list: List[str], token: str) -> List[dict]:
                 "generalResponse": generalResponse,
                 "inputText": text
             },
-            "priceList": filtered_depths
+            "priceList": filtered_prices
         })
 
     return results
