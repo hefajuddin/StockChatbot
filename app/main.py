@@ -46,6 +46,7 @@ class APIResponseSimple(BaseModel):
     results: List[APIResponseItemSimple]
 
 
+app = FastAPI()
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -53,7 +54,6 @@ from typing import List
 import redis
 import itertools
 import httpx
-app = FastAPI()
 
 # Redis connection
 r = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
@@ -111,6 +111,12 @@ async def predict_batch(request: APIRequest, token: str = Depends(get_current_to
     return {"results": results}
 
 
+from app.redis_utils import save_to_redis, get_from_redis, delete_from_redis
+@app.post("/logout")
+def logout(user_id: str):
+    delete_from_redis(user_id)
+    return {"message": f"{user_id} logged out and cache cleared"}
+
 
 async def infer_batch(text_list: list[str], token: str) -> list[dict]:
     results = []
@@ -118,6 +124,7 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
     texts = [prepare_text_for_infer(t) for t in text_list]
     inputs = tokenizer(texts, return_tensors="pt", padding=True, truncation=True, max_length=64)
     inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
+    # print("Tokenized inputs:", inputs)
 
     with torch.no_grad():
         logits = model(**inputs)
@@ -129,10 +136,14 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
             logits[3][i:i+1], logits[4][i:i+1], logits[5][i:i+1]
         )
         ner_result = decode_ner_confident(text, ner_logits, label_maps["ner_label2id"])
+        print("NER Result:", ner_result)
 
-        tradingCodes = [x["text"] for x in ner_result if "tradingCode" in x["tag"]]
-        marketTypes = [x["text"] for x in ner_result if "marketType" in x["tag"]]
-        stockExchanges = [x["text"] for x in ner_result if "stockExchange" in x["tag"]]
+        from collections import OrderedDict 
+
+        tradingCodes = list(OrderedDict.fromkeys(x["text"] for x in ner_result if "tradingCode" in x["tag"]))
+        # tradingCodes = [x["text"] for x in ner_result if "tradingCode" in x["tag"]]
+        marketTypes = list(OrderedDict.fromkeys(x["text"] for x in ner_result if "marketType" in x["tag"]))
+        stockExchanges = list(OrderedDict.fromkeys(x["text"] for x in ner_result if "stockExchange" in x["tag"]))
         intent_label = get_label(intent_logits, label_maps["intent_label2id"])
         sentiment_label = get_label(sentiment_logits, label_maps["sentiment_label2id"])
         priceStatus_label = get_label(priceStatus_logits, label_maps["priceStatus_label2id"])
@@ -141,11 +152,8 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
         print('aaaaaaaaaaaaaaaaaa',tradingCodes, marketTypes, stockExchanges, intent_label, sentiment_label, priceStatus_label, language_label, context_label)
 
-
-
-
         # ➡️ Redis-এ সেভ (শর্ত সহ)
-        user_id = "ai_hefaj"  # ডেভেলপমেন্টে হার্ডকোড
+        user_id = "ai_hefaj"  # fix user_id for development; will be dynamic in production
 
         save_to_redis(
             user_id,
@@ -160,8 +168,8 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
         )
 
         # --- Redis থেকে সব ডেটা পড়া ---
-        key = f"chat:{user_id}"
-        stored = r.hgetall(key)  # সব ফিল্ড dict আকারে রিটার্ন করে
+        user_id = "ai_hefaj"
+        stored = get_from_redis(user_id)  # hgetall + TTL রিফ্রেশ
 
         # hgetall সাধারণত {b'key': b'value'} রিটার্ন করে, তাই decode দরকার হতে পারে
         decoded = {k.decode() if isinstance(k, bytes) else k:
@@ -178,7 +186,7 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
         priceStatus_label = decoded.get("priceStatus")
         context_label     = decoded.get("context")
 
-        print("Decoded redis data:", decoded)
+        # print("Decoded redis data:", decoded)
 
         priceList = []
         headers = {"Authorization": f"Bearer {token}"}
@@ -186,12 +194,13 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
         market_types = [x for x in market_types if x] or ["public"]
         trading_codes = [x for x in trading_codes if x] or []
 
+
         combos = list(itertools.product(
             stock_exchanges,
             market_types,
             trading_codes
         ))
-        print("Combos:", combos)
+        # print("Combos:", combos)
 
 
             # === Endpoint Mapping ===
@@ -208,6 +217,7 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
         # এখন combos থেকে API কল
         # === API Call (only if trading_codes exist) ===
+        # print("Endpoint:", endpoint, "Trading Codes:", trading_codes)
         if endpoint and trading_codes:
             async with httpx.AsyncClient() as client:
                 for se, mt, tc in combos:
@@ -227,12 +237,22 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
                             "error": str(e),
                             "text": text
                         })
-        print("Price List:", priceList)
+        # print("Price List:", priceList)
 
         # === Always build response ===
         generalResponse = build_general_response(
             language_label, sentiment_label, intent_label, priceStatus_label, combos
         )
+
+        
+        # === Special Case: price_status, se, mt আছে কিন্তু trading_code নাই ===
+        if intent_label and priceStatus_label and not trading_codes:
+            generalResponse.append("Please provide the TradingCode/Item properly to get expected response.")
+
+
+        # === If nothing found but still a valid follow-up ===
+        if not generalResponse:
+            generalResponse.append("I need a bit more detail to assist you properly. Could you clarify?")
 
         # === Filter market depths (if any) ===
         filtered_prices = filter_priceList(priceList, generalResponse, priceStatus_label)
@@ -240,7 +260,7 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
         results.append({
             "results": {
-                "tradingCodes": tradingCodes,
+                "tradingCodes": trading_codes,
                 "marketTypes": market_types,
                 "stockExchanges": stock_exchanges,
                 "intent": intent_label,
@@ -257,153 +277,3 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
     return results
 
 
-
-
-
-
-# async def infer_batch(text_list: List[str], token: str) -> List[dict]:
-#     # ---- preprocess + tokenize just like training ----
-#     texts = [prepare_text_for_infer(t) for t in text_list]
-#     inputs = tokenizer(texts, return_tensors="pt", padding=True, truncation=True, max_length=64)
-#     inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
-
-#     with torch.no_grad():
-#         logits = model(**inputs)
-
-#     results = []
-#     for i, text in enumerate(texts):
-#         ner_logits, intent_logits, sentiment_logits, priceStatus_logits, language_logits, context_logits = (
-#             logits[0][i:i+1], logits[1][i:i+1], logits[2][i:i+1],
-#             logits[3][i:i+1], logits[4][i:i+1], logits[5][i:i+1]
-#         )
-
-#         ner_result = decode_ner_confident(text, ner_logits, label_maps["ner_label2id"])
-#         arguments = {
-#             "trading_codes": [item["text"] for item in ner_result if "tradingCode" in item["tag"]],
-#             "marketType": [item["text"] for item in ner_result if "marketType" in item["tag"]],
-#             "stockExchange": [item["text"] for item in ner_result if "stockExchange" in item["tag"]],
-#         }
-        
-#         tradingCodes = arguments["trading_codes"]
-#         marketTypes = arguments["marketType"]
-#         stockExchanges = arguments["stockExchange"]
-#         intent_label = get_label(intent_logits, label_maps["intent_label2id"])
-#         sentiment_label = get_label(sentiment_logits, label_maps["sentiment_label2id"])
-#         priceStatus_label = get_label(priceStatus_logits, label_maps["priceStatus_label2id"])
-#         language_label = get_label(language_logits, label_maps["language_label2id"])
-#         context_label = get_label(context_logits, label_maps["context_label2id"])
-
-#         # === Endpoint Mapping ===
-#         if intent_label == 'sharePrice':
-#             endpoint = SHAREPRICE_ENDPOINT
-#         elif intent_label == 'portfolio':
-#             endpoint = PORTFOLIO_ENDPOINT
-#         elif intent_label == 'balance':
-#             endpoint = BALANCE_ENDPOINT
-#         else:
-#             endpoint = None
-
-#         print('aaaaaaaaaaaaaaaaaa',tradingCodes, marketTypes, stockExchanges, intent_label, sentiment_label, priceStatus_label, language_label, context_label)
-            
-#         user_id = "ai_hefaj"  # ডেভেলপমেন্টের জন্য হাডকোডেড, প্রোডাকশনে পরিবর্তন করতে হবে
-                
-#         @app.post("/save")
-#         async def save_state(data: ChatData):
-#             user_id = "ai_hefaj"
-#             key = f"chat:{user_id}"
-
-#             # Redis-এ save করার জন্য mapping বানানো
-#             mapping = {
-#                 "tradingCodes": "|".join(data.tradingCodes),
-#                 "marketTypes": "|".join(data.marketTypes),
-#                 "stockExchanges": "|".join(data.stockExchanges),
-#                 "intent": data.intent_label,
-#                 "sentiment": data.sentiment_label,
-#                 "language": data.language,
-#                 "context": data.context_label,
-#                 # অন্যান্য ফিল্ড যেমন generalResponse...
-#             }
-
-#             # শুধুমাত্র যদি priceStatus_label != 'No' হয় তখন আপডেট হবে
-#             if data.priceStatus_label != "No":
-#                 mapping["priceStatus"] = data.priceStatus_label
-
-#             # Redis-এ save করা
-#             r.hset(key, mapping=mapping)
-#             r.expire(key, 3600)  # TTL 1 ঘন্টা
-
-#         key = f"chat:{user_id}"
-#         stored = r.hgetall(key)  # সব ফিল্ড dict আকারে ফিরে আসে
-
-#         trading_codes = stored.get(b'tradingCodes', b'').decode().split("|")
-#         market_types = stored.get(b'marketTypes', b'').decode().split("|")
-#         stock_exchanges = stored.get(b'stockExchanges', b'').decode().split("|")
-
-#         print('storedddddddddddddddddd',trading_codes, market_types, stock_exchanges)
-
-
-#         priceList = []
-#         headers = {"Authorization": f"Bearer {token}"}
-#         combos = list(itertools.product(
-#             stock_exchanges or ["dse"],
-#             market_types or ["public"],
-#             trading_codes or []
-#         ))
-
-#         print('combosssssssss',trading_codes, market_types, stock_exchanges)
-
-#         # === API Call (only if trading_codes exist) ===
-#         if endpoint and arguments["trading_codes"]:
-#             async with httpx.AsyncClient() as client:
-#                 for se, mt, tc in combos:
-#                     url = f"{endpoint}/{se}/{mt}/{tc}"
-#                     try:
-#                         resp = await client.get(url, headers=headers)
-#                         if resp.status_code == 200:
-#                             priceList.append(resp.json())
-#                         else:
-#                             priceList.append({
-#                                 "error": f"API returned {resp.status_code}",
-#                                 "details": resp.text,
-#                                 "text": text
-#                             })
-#                     except Exception as e:
-#                         priceList.append({
-#                             "error": str(e),
-#                             "text": text
-#                         })
-
-#         # === Always build response ===
-#         generalResponse = build_general_response(
-#             language_label, sentiment_label, intent_label, priceStatus_label, arguments, combos
-#         )
-
-
-#         # # === Special Case: price_status, se, mt আছে কিন্তু trading_code নাই ===
-#         # if intent_label == "sharePrice" and priceStatus_label and (arguments["marketType"] or arguments["stockExchange"]) and not arguments["trading_codes"]:
-#         #     generalResponse.append("Please provide the TradingCode/Item properly to get expected response.")
-
-#         # # === If nothing found but still a valid follow-up ===
-#         # if not generalResponse:
-#         #     generalResponse.append("I need a bit more detail to assist you properly. Could you clarify?")
-
-#         # === Filter market depths (if any) ===
-#         filtered_prices = filter_priceList(priceList, generalResponse, priceStatus_label)
-
-#         results.append({
-#             "results": {
-#                 "tradingCodes": tradingCodes,
-#                 "marketTypes": marketTypes,
-#                 "stockExchanges": stockExchanges,
-#                 "intent": intent_label,
-#                 "sentiment": sentiment_label,
-#                 "language": language_label,
-#                 "priceStatus": priceStatus_label,
-#                 "context": context_label,
-#                 "generalResponse": generalResponse,
-#                 "inputText": text
-#             },
-#             "priceList": filtered_prices
-#         })
-
-#     return results

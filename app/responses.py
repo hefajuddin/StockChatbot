@@ -22,6 +22,9 @@ RESPONSES = {
             "portfolio": "আপাতত এই বিষয়ে আমার যথেষ্ট জ্ঞান নেই। এ বিষয়ে আমি শিখছি...",
             "balance": "আপাতত এই বিষয়ে আমার যথেষ্ট জ্ঞান নেই। এ বিষয়ে আমি শিখছি...",
             "other": "আপাতত এই বিষয়ে আমার যথেষ্ট জ্ঞান নেই। দয়াকরে বাংলাদেশ স্টক মার্কেট সম্পর্কে স্পষ্ট প্রশ্ন করুন।",
+            "dialogue": "দয়াকরে বাংলাদেশ স্টক মার্কেট সম্পর্কে স্পষ্ট প্রশ্ন করুন।",
+            "comment": "ধন্যবাদ। বুঝতে পেরেছি...,",
+            None : "প্রত্যাশিত উত্তর পাওয়ার জন্য স্পষ্ট প্রশ্ন করুন।",
         },
         "sharePrice": {
             "volume": "{se} তে {mt} মার্কেটে {tc} এর volume হল-",
@@ -57,7 +60,10 @@ RESPONSES = {
             "trade": "apatoto ei bisoye amar jothesto gyan nei. ei bisoye ami shikhchi...",
             "portfolio": "apatoto ei bisoye amar jothesto gyan nei. ei bisoye ami shikhchi...",
             "balance": "apatoto ei bisoye amar jothesto gyan nei. ei bisoye ami shikhchi...",
-            "other": "apatoto ei bisoye amar jothesto gyan nei. doyakore bangladesh stock market somporke spostho proshno korun."
+            "other": "apatoto ei bisoye amar jothesto gyan nei. doyakore bangladesh stock market somporke spostho proshno korun.",
+            "dialogue": "doyakore bangladesh stock market somporke spostho proshno korun.",
+            "comment": "dhonnobad. bujhte perechi...,",
+            None : "protyashito uttor pawar jonno spostho proshno korun।",
         },
         "sharePrice": {
             "volume": "{se} te {mt} market e {tc} er volume holo-",
@@ -92,7 +98,10 @@ RESPONSES = {
             "trade": "I don't have enough knowledge on this topic yet. I'm still learning...",
             "portfolio": "I don't have enough knowledge on this topic yet. I'm still learning...",
             "balance": "I don't have enough knowledge on this topic yet. I'm still learning...",
-            "other": "I don't have enough knowledge on this topic yet. Please ask a clear question about the Bangladesh stock market."
+            "other": "I don't have enough knowledge on this topic yet. Please ask a clear question about the Bangladesh stock market.",
+            "dialogue": "Please ask a clear question about the Bangladesh stock market.",
+            "comment": "Thank you. I understand...,",
+            None : "Please ask a clear question to get the expected answer.",
         },
         "sharePrice": {
             "volume": "At {se} in {mt} market {tc}'s volume is-",

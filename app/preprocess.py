@@ -486,9 +486,9 @@ def convert_word(word, mapping, suffix_map, cutoff: int = 80):
 
     # === precompute সব বাংলা ভ্যালু একবারে ===
     all_bangla = [b for bl in mapping.values() for b in bl]
-    print("convertwwwwwwwwwwww||wwwwwwwNoword", word)
+    # print("convertwwwwwwwwwwww||wwwwwwwNoword", word)
     word = normalize_unicode(word)
-    print("convertwwwwwwwwwwww||wwwwwwword", word)
+    # print("convertwwwwwwwwwwww||wwwwwwword", word)
     # ---------- 1️⃣ Suffix Handling ----------
     for suf in sorted(suffix_map.keys(), key=len, reverse=True):
         if word.endswith(suf):
@@ -526,7 +526,7 @@ def convert_word(word, mapping, suffix_map, cutoff: int = 80):
                     return eng
 
     # ---------- 4️⃣ No Match ----------
-    print("DEBUG: no mapping found for", word)
+    # print("DEBUG: no mapping found for", word)
     return word
 
 
@@ -540,7 +540,7 @@ bangla2english_mapping = {
 
 def convert_sentence(text):
     words = text.split()
-    print("convertssssssssssppppppppppppppppppp", " ".join(convert_word(w, bangla2english_mapping , suffix_map) for w in words))
+    # print("convertssssssssssppppppppppppppppppp", " ".join(convert_word(w, bangla2english_mapping , suffix_map) for w in words))
     return " ".join(convert_word(w, bangla2english_mapping , suffix_map) for w in words)
 
 
@@ -552,9 +552,9 @@ from html import unescape
 def preprocess(text, remove_repetition=True):
     text = convert_sentence(text)
     text = text.lower()  # lowercase all English
-    print("preprocessssssssssssssssssss lower", text)
+    # print("preprocessssssssssssssssssss lower", text)
     # text = unicodedata.normalize("NFC", text)
-    print("preprocessssssssssssssssssss nfc", text)
+    # print("preprocessssssssssssssssssss nfc", text)
     text = unescape(text)
     
     # Remove HTML tags
@@ -571,7 +571,7 @@ def preprocess(text, remove_repetition=True):
         # Reduce repeated letters/punctuations to a single occurrence
         text = re.sub(r'(.)\1+', r'\1', text)
     
-    print("processsssssss", text)
+    # print("processsssssss", text)
     return text
 
 
@@ -600,7 +600,7 @@ def tokenize_protect_entities(text, trading_codes, market_types, stock_exchanges
 
     # Replace placeholders back with original entity
     tokens = [entity_map.get(t, t) for t in tokens]
-    print("tokenizeeeeeeeeeee", tokens)
+    # print("tokenizeeeeeeeeeeeeeeeee", tokens)
 
     return tokens
 
