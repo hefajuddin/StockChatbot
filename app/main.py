@@ -68,7 +68,7 @@ app.add_middleware(
 )
 
 # Redis connection
-r = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+# r = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
 
 # Pydantic model
 class ChatData(BaseModel):
@@ -154,18 +154,18 @@ async def login(request: LoginRequest):
         new_access = data.get("accessToken") or access
         new_refresh = data.get("refreshToken") or refresh
         new_expiry = data.get("accessTokenExpiryDateTimeUtc") or expiry
-        # print('xxxxa',new_access)
-        # print('xxxxxr',new_refresh)
-        # print('xxxxxxe',new_expiry)
-        # print('xxxxxxxd',device_id)
+        print('xxxxa',new_access)
+        print('xxxxxr',new_refresh)
+        print('xxxxxxe',new_expiry)
+        print('xxxxxxxd',device_id)
 
     # ---- save to Redis ----
     
-    _save_session_to_redis(user_id, new_access, new_refresh, new_expiry, device_id)
+    await _save_session_to_redis(user_id, new_access, new_refresh, new_expiry, device_id)
+
     asyncio.create_task(periodic_refresh(user_id))
 
     return {"token": new_access}
-
 
 
 #     # -------- call refresh API --------
@@ -183,8 +183,8 @@ async def login(request: LoginRequest):
 #             raise HTTPException(status_code=503, detail=f"Refresh request failed: {e}")
 
 #     if resp.status_code != 200:
-#         r.delete(session_key)
-#         r.delete(token_map_key)
+#         await r.delete(session_key)
+#         await r.delete(token_map_key)
 #         raise HTTPException(status_code=401, detail="Refresh failed; please login again")
 
 #     data = resp.json().get("data") or {}
@@ -206,7 +206,7 @@ def _make_token_key(token: str) -> str:
 
 
 # ----------------- Redis session save -----------------
-def _save_session_to_redis(
+async def _save_session_to_redis(
     user_id: str,
     access_token: str,
     refresh_token: str,
@@ -218,24 +218,25 @@ def _save_session_to_redis(
     """
     clean_token = access_token.strip()
     session_key = f"session:{user_id}"
- 
+
+
     # print("xxx_expiry_iso", expiry_iso)
 
     # Save session as hash
-    r.hset(session_key, mapping={
+    await r.hset(session_key, mapping={
         "accessToken": clean_token,
         # "refreshToken": refresh_token or "",
         "deviceId": device_id or "",
         "expiry": expiry_iso or ""
     })
-    r.expire(session_key, 18*60*60)
+    await r.expire(session_key, 18*60*60)
 
     refresh_key = f"refresh:{user_id.strip()}"
-    r.set(refresh_key, refresh_token, ex=18*60*60)
+    await r.set(refresh_key, refresh_token, ex=18*60*60)
     # print("set_refresh_token", refresh_token)
 
     # user_key = f"user:{refresh_token}"
-    # r.set(user_key, user_id, ex=11*60*60)
+    # await r.set(user_key, user_id, ex=11*60*60)
 
     # TTL for token
     if expiry_iso:
@@ -249,13 +250,13 @@ def _save_session_to_redis(
     else:
         ttl_token = 20
 
-    print("[DEBUG] PING:", r.ping())
+    print("[DEBUG] PING:", await r.ping())
     # print("Saved mapping:", clean_token, "->", user_id)
-    # print("Check in redis:", r.get(clean_token))
+    # print("Check in redis:", await r.get(clean_token))
     # print("[DEBUG] Going to save token", access_token[:20], "...")
 
 
-    r.expire(session_key, ttl_token + 3600)
+    await r.expire(session_key, ttl_token + 3600)
 
     # print(f"[SAVE] {clean_token} -> {user_id} (TTL {ttl_token}s)")
 
@@ -317,26 +318,58 @@ async def refresh_if_needed(clean_token: str,
 
 
 
+
+
+async def read_session(user_id: str):
+    session_key = f"session:{user_id}"
+    raw_data = await r.hgetall(session_key)
+
+    decoded = {
+        k.decode() if isinstance(k, bytes) else k:
+        v.decode() if isinstance(v, bytes) else v
+        for k, v in raw_data.items()
+    }
+    return decoded
+
+
+
 # ----------------- Validate / refresh token -----------------
 async def get_valid_token(current_access_token: str, user_id: str) -> str:
     """Redis থেকে token লোড করে expiry চেক করে, দরকার হলে রিফ্রেশ করে"""
 
     if not user_id:
         raise HTTPException(status_code=401, detail="Unknown token / session not found")
+ 
 
     clean_token = (current_access_token or "").strip()
-    session_key = f"session:{user_id}"
-    session = r.hgetall(session_key) or {}
 
-    stored_access = (session.get("accessToken") or "").strip()
-    expiry_iso = session.get("expiry") or ""
-    device_id = session.get("deviceId") or "web-ui"
+
+    # session_key = f"session:{user_id}"
+    # session = await r.hgetall(session_key) or {}
+    # stored_access = (session.get("accessToken") or "").strip()
+    # expiry_iso = session.get("expiry") or ""
+    # device_id = session.get("deviceId") or "web-ui"
+
+
+    data = await read_session(user_id)
+    stored_access = (data.get("accessToken") or "").strip()
+    expiry_iso = data.get("expiry") or ""    
+    device_id = data.get("deviceId") or "web-ui"
+
+
+
+
 
     if stored_access and stored_access != clean_token:
         clean_token = stored_access
 
     refresh_key = f"refresh:{user_id.strip()}"
-    refresh_token = r.get(refresh_key)
+    # refresh_token = await r.get(refresh_key)
+
+    val = await r.get(refresh_key)
+    refresh_token = val.decode() if isinstance(val, bytes) else val
+
+
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Refresh token not available; please login again")
 
@@ -366,14 +399,14 @@ async def get_valid_token(current_access_token: str, user_id: str) -> str:
         return result
 
     # পুরনো সেশন ডিলিট
-    before = r.hgetall(session_key)
-    print("[DEBUG] Before delete:", before)
-    deleted = r.delete(session_key)
-    print(f"[DEBUG] Deleted {deleted} key(s): {session_key}")
-    print("[DEBUG] After delete:", r.hgetall(session_key))
+    # before = await r.hgetall(session_key)
+    # print("[DEBUG] Before delete:", before)
+    # deleted = await r.delete(session_key)
+    # print(f"[DEBUG] Deleted {deleted} key(s): {session_key}")
+    # print("[DEBUG] After delete:", await r.hgetall(session_key))
 
     # নতুন সেশন সেভ করো
-    _save_session_to_redis(user_id, new_access, new_refresh, new_expiry, device_id)
+    await _save_session_to_redis(user_id, new_access, new_refresh, new_expiry, device_id)
     return new_access
 
 
@@ -400,13 +433,33 @@ async def periodic_refresh(user_id: str):
     while True:
         try:
             session_key = f"session:{user_id}"
-            session = r.hgetall(session_key) or {}
+            # session = await r.hgetall(session_key) or {}
 
-            access_token = (session.get("accessToken") or "").strip()
-            expiry_iso = session.get("expiry") or ""
-            device_id = session.get("deviceId") or "web-ui"
+            # access_token = (session.get("accessToken") or "").strip()
+            # expiry_iso = session.get("expiry") or ""
+            # device_id = session.get("deviceId") or "web-ui"
+            # refresh_key = f"refresh:{user_id.strip()}"
+            # refresh_token = await r.get(refresh_key)
+
+
+            data = await read_session(user_id)
+            access_token = (data.get("accessToken") or "").strip()
+            expiry_iso = data.get("expiry") or ""    
+            device_id = data.get("deviceId") or "web-ui"
+
             refresh_key = f"refresh:{user_id.strip()}"
-            refresh_token = r.get(refresh_key)
+            val = await r.get(refresh_key)
+            refresh_token = val.decode() if isinstance(val, bytes) else val
+
+            # print("--------==============----------")
+            # print("access::", access_token)
+            # print("refresh::", refresh_token)
+            # print("expiry::", expiry_iso)
+            # now = datetime.now()
+            # print("Local Time::", now)
+
+
+
 
             if not access_token or not expiry_iso or not refresh_token:
                 print(f"[Periodic] Missing tokens/session for user_id={user_id}. Sleeping 60s.")
@@ -432,8 +485,8 @@ async def periodic_refresh(user_id: str):
                     if e.status_code == 401:
                         # Invalid refresh, delete session and refresh token
                         print(f"[Periodic] Deleting invalid session/refresh token for user_id={user_id}")
-                        r.delete(session_key)
-                        r.delete(refresh_key)
+                        await r.delete(session_key)
+                        await r.delete(refresh_key)
                         break  # stop periodic_refresh
                     else:
                         # অন্য কোনো error হলে পরের iteration এ আবার চেষ্টা হবে
@@ -443,7 +496,7 @@ async def periodic_refresh(user_id: str):
                 # update Redis session
                 if isinstance(result, tuple):
                     new_access, new_refresh, new_expiry = result
-                    _save_session_to_redis(user_id, new_access, new_refresh, new_expiry, device_id)
+                    await _save_session_to_redis(user_id, new_access, new_refresh, new_expiry, device_id)
                     print(f"[Periodic] Session updated for user_id={user_id}")
                 else:
                     print(f"[Periodic] No refresh needed, token valid for user_id={user_id}")
@@ -460,7 +513,7 @@ async def periodic_refresh(user_id: str):
 # ----------------- Get current token -----------------
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(bearer_scheme)):
     """
-    Dependency for endpoints: validates Authorization header.
+    Dependency for endpoints: validates Authorization header
     Returns a valid access token string.
     """
     # print("Credentials:", credentials)
@@ -479,7 +532,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(
 # ----------------- Get current token -----------------
 async def get_current_token(credentials: HTTPAuthorizationCredentials = Security(bearer_scheme)):
     """
-    Dependency for endpoints: validates Authorization header.
+    Dependency for endpoints: validates Authorization headeawait r.
     Returns a valid access token string.
     """
     # print("Credentials:", credentials)
@@ -536,21 +589,24 @@ async def predict_batch(request: APIRequest, token: str = Depends(get_current_to
 
     results = await infer_batch(text_list, token)
 
-    print("Redis Keys print")
-    for key in r.scan_iter("*"):             # সব key ধাপে ধাপে আনে
-        key_type = r.type(key)
-        print(f"\nKey: {key}  (type: {key_type})")
 
-        if key_type == "string":
-            print("Value:", r.get(key))
-        elif key_type == "hash":
-            print("Value:", r.hgetall(key))
-        elif key_type == "list":
-            print("Value:", r.lrange(key, 0, -1))
-        elif key_type == "set":
-            print("Value:", r.smembers(key))
-        elif key_type == "zset":
-            print("Value:", r.zrange(key, 0, -1, withscores=True))
+
+
+    # print("Redis Keys print")
+    # for key in await r.scan_iter("*"):             # সব key ধাপে ধাপে আনে
+    #     key_type = await r.type(key)
+    #     print(f"\nKey: {key}  (type: {key_type})")
+
+    #     if key_type == "string":
+    #         print("Value:", await r.get(key))
+    #     elif key_type == "hash":
+    #         print("Value:", await r.hgetall(key))
+    #     elif key_type == "list":
+    #         print("Value:", await r.lrange(key, 0, -1))
+    #     elif key_type == "set":
+    #         print("Value:", await r.smembers(key))
+    #     elif key_type == "zset":
+    #         print("Value:", await r.zrange(key, 0, -1, withscores=True))
 
     return {"results": results}
 
@@ -575,9 +631,24 @@ async def logout(authorization: str | None = Header(default=None)):
         raise HTTPException(status_code=400, detail="Invalid token or user_id not found")
 
     # delete_from_redis synchronous, তাই threadpool এ রান করি
-    await run_in_threadpool(delete_from_redis, user_id)
+    # await run_in_threadpool(delete_from_redis, user_id)
+    await delete_from_redis(user_id)
 
     return {"message": f"{user_id} logged out and cache cleared"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -617,10 +688,15 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
         # print('aaaaaaaaaaaaaaaaaa',tradingCodes, marketTypes, stockExchanges, intent_label, sentiment_label, priceStatus_label, language_label, context_label)
 
-        # ➡️ Redis-এ সেভ (শর্ত সহ)
-        user_id = "ai_hefaj"  # fix user_id for development; will be dynamic in production
+     # ➡️ Redis-এ সেভ (শর্ত সহ)
+        # fix user_id for development; will be dynamic in production
 
-        save_to_redis(
+        try:
+            user_id = await get_user_id_from_jwt(token.strip())
+        except Exception as e:
+            raise HTTPException(status_code=401, detail=f"Invalid token: {e}")
+
+        await save_to_redis(
             user_id,
             tradingCodes,
             marketTypes,
@@ -633,13 +709,13 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
         )
 
         # --- Redis থেকে সব ডেটা পড়া ---
-        user_id = "ai_hefaj"
-        stored = get_from_redis(user_id)  # hgetall + TTL রিফ্রেশ
+        # user_id = "ai_hefaj"
+        decoded = await get_from_redis(user_id)  # hgetall + TTL রিফ্রেশ
 
         # hgetall সাধারণত {b'key': b'value'} রিটার্ন করে, তাই decode দরকার হতে পারে
-        decoded = {k.decode() if isinstance(k, bytes) else k:
-                v.decode() if isinstance(v, bytes) else v
-                for k, v in stored.items()}
+        # decoded = {k.decode() if isinstance(k, bytes) else k:
+        #         v.decode() if isinstance(v, bytes) else v
+        #         for k, v in stored.items()}
 
         # যেসব ফিল্ড '|' দিয়ে সেভ করা, সেগুলো split করে নাও
         trading_codes   = decoded.get("tradingCodes", "").split("|")   if decoded.get("tradingCodes")   else []
@@ -710,14 +786,30 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
         )
 
         
-        # === Special Case: price_status, se, mt আছে কিন্তু trading_code নাই ===
+        # # === Special Case: price_status, se, mt আছে কিন্তু trading_code নাই ===# generalResponse যদি লিস্ট হয় তাহলে এটা
+        # if intent_label and priceStatus_label and not trading_codes:
+        #     generalResponse.append("Please provide the TradingCode/Item properly to get expected response.")
+
+
+
+            # === Special Case: price_status, se, mt আছে কিন্তু trading_code নাই ===# generalResponse যদি ডিকশনারি হয় তাহলে এটা
         if intent_label and priceStatus_label and not trading_codes:
-            generalResponse.append("Please provide the TradingCode/Item properly to get expected response.")
+            generalResponse["recommendResponse"].append(
+                "Please provide the TradingCode/Item properly to get expected response."
+            )
 
 
-        # === If nothing found but still a valid follow-up ===
+        # # === If nothing found but still a valid follow-up ===# generalResponse যদি লিস্ট হয় তাহলে এটা
+        # if not generalResponse:
+        #     generalResponse["recommendResponse"].append("I need a bit more detail to assist you properly. Could you clarify?")
+
+
+        # === If nothing found but still a valid follow-up ===# generalResponse যদি ডিকশনারি হয় তাহলে এটা
+        # if not generalResponse["recommendResponse"] and not generalResponse["priceResponse"]:
         if not generalResponse:
-            generalResponse.append("I need a bit more detail to assist you properly. Could you clarify?")
+            generalResponse["recommendResponse"].append(
+                "I need a bit more detail to assist you properly. Could you clarify?"
+            )
 
         # === Filter market depths (if any) ===
         filtered_prices = filter_priceList(priceList, generalResponse, priceStatus_label)
