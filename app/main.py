@@ -162,6 +162,7 @@ async def login(request: LoginRequest):
     # ---- save to Redis ----
     
     _save_session_to_redis(user_id, new_access, new_refresh, new_expiry, device_id)
+    asyncio.create_task(periodic_refresh(user_id))
 
     return {"token": new_access}
 
@@ -378,11 +379,11 @@ async def get_valid_token(current_access_token: str, user_id: str) -> str:
 
 from datetime import datetime, timedelta, timezone
 
-@app.on_event("startup")
-async def start_background_tasks():
-    print("[Startup] Scheduling periodic_refreshবববববববববববববববববববববববব")
-    user_id = "65ca1cdea37a8fd05090dc46"  # এখানে প্রপার user_id ব্যবহার করতে হবে
-    asyncio.create_task(periodic_refresh(user_id))
+# @app.on_event("startup")
+# async def start_background_tasks():
+#     print("[Startup] Scheduling periodic_refreshবববববববববববববববববববববববব")
+#     user_id = "65ca1cdea37a8fd05090dc46"  # এখানে প্রপার user_id ব্যবহার করতে হবে
+#     asyncio.create_task(periodic_refresh(user_id))
 
 
 
