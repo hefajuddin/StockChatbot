@@ -13,6 +13,7 @@ RESPONSES = {
             "fun": "হুম.. আমি বুঝতে পেরেছি তুমি আমার সাথে মজা করছ। এসব বাদ দিয়ে শেয়ার মার্কেটে মনোযোগ দাও, প্রয়োজনে আমার সহযোগিতা নাও।",
             "greet": "হ্যালো বন্ধু, আমি আপনাকে সাহায্য করতে সর্বদা প্রস্তুত-",
             "nudity": "নগ্নতা এখানে অনুমোদিত নয়, দয়াকরে সংযত হোন।",
+            "concern": "আপনার উদ্বেগের জন্য দুঃখিত। আপনার উদ্বেগের বিষয়টি নিয়ে আমি কাজ করছি।",
             # "shortcut": "আচ্চা...",
             "neutral": "",
         },
@@ -27,15 +28,15 @@ RESPONSES = {
             None : "প্রত্যাশিত উত্তর পাওয়ার জন্য স্পষ্ট প্রশ্ন করুন।",
         },
         "sharePrice": {
-            "volume": "{se} তে {mt} মার্কেটে {tc} এর volume হল-",
-            "ltp": "{se} তে {mt} মার্কেটে {tc} এর ltp হল-",
-            "value": "{se} তে {mt} মার্কেটে {tc} এর value হল-",
-            "ycp": "{se} তে {mt} মার্কেটে {tc} এর  ycp হল-",
-            "maketDepth": "{se} তে {mt} মার্কেটে {tc} এর market depth হল-",
-            "all": "{se} তে {mt} মার্কেটে {tc} এর price সম্পর্কে বিস্তারিত হল-",
-            "marketDepth": "{se} তে {mt} মার্কেটে {tc} এর market depth হল-",
-            "price": "{se} তে {mt} মার্কেটে {tc} এর price সম্পর্কে তথ্য হল-",
+            "volume": "{se} তে {mt} মার্কেটে {tc} এর volume-",
+            "ltp": "{se} তে {mt} মার্কেটে {tc} এর ltp-",
+            "value": "{se} তে {mt} মার্কেটে {tc} এর value-",
+            "ycp": "{se} তে {mt} মার্কেটে {tc} এর  ycp-",
+            "all": "{se} তে {mt} মার্কেটে {tc} এর price সম্পর্কে বিস্তারিত-",
+            "marketDepth": "{se} তে {mt} মার্কেটে {tc} এর market depth-",
+            "price": "{se} তে {mt} মার্কেটে {tc} এর price সম্পর্কে তথ্য-",
             "No": "{tc} এর সম্পর্কে আপনি কী জানতে চান, দয়াকরে স্পষ্টভাবে বলুন-",
+            None: " পাওয়া যায়নি।"
         },
 
     },
@@ -52,6 +53,7 @@ RESPONSES = {
             "fun": "hum.. ami bujhte perechi tumi amar sathe moja korcho. eshob bad diye share market-e monojog dao, proyojone amar sohojogita nao.",
             "greet": "hello bondhu, ami apnake sahajjo korte shorboda prostut-",
             "nudity": "nognota ekhane onumodito noy, doyakore songjoto hon.",
+            "concern": "apnar uddog-er jonno dukhito. apnar uddog-er bishoyti niye ami kaj korchi.",
             # "shortcut": "accha...",
             "neutral": "",
         },
@@ -66,15 +68,15 @@ RESPONSES = {
             None : "protyashito uttor pawar jonno spostho proshno korun।",
         },
         "sharePrice": {
-            "volume": "{se} te {mt} market e {tc} er volume holo-",
-            "ltp": "{se} te {mt} market e {tc} er ltp holo-",
-            "value": "{se} te {mt} market e {tc} er value holo-",
-            "ycp": "{se} te {mt} market e {tc} er ycp holo-",
-            "maketDepth": "{se} te {mt} market e {tc} er market depth holo-",
-            "all": "{se} te {mt} market e {tc} er price somporke bistariito holo-",
-            "marketDepth": "{se} te {mt} market e {tc} er market depth holo-",
-            "price": "{se} te {mt} market e {tc} er price somporke tottho holo-",
-            "No": "{tc} er somporke apni ki jante chan, doyakore spostho bhabe bolun-"
+            "volume": "{se} te {mt} market e {tc} er volume-",
+            "ltp": "{se} te {mt} market e {tc} er ltp-",
+            "value": "{se} te {mt} market e {tc} er value-",
+            "ycp": "{se} te {mt} market e {tc} er ycp-",
+            "all": "{se} te {mt} market e {tc} er price somporke bistariito-",
+            "marketDepth": "{se} te {mt} market e {tc} er market depth-",
+            "price": "{se} te {mt} market e {tc} er price somporke tottho-",
+            "No": "{tc} er somporke apni ki jante chan, doyakore spostho bhabe bolun-",
+            None: " paoa jai ni।"
         }
     },
 
@@ -90,6 +92,7 @@ RESPONSES = {
             "fun": "Haha.. I see you are joking with me. Let's focus on the stock market, and feel free to ask for my help if needed.",
             "greet": "Hello friend, I am always ready to help you-",
             "nudity": "Nudity is not allowed here, please be cautious.",
+            "concern": "Sorry for your concern. I am working on the issue you raised.",
             # "shortcut": "absolutely...",
             "neutral": "",
         },
@@ -108,11 +111,11 @@ RESPONSES = {
             "ltp": "At {se} in {mt} market {tc}'s LTP is-",
             "value": "At {se} in {mt} market {tc}'s value is-",
             "ycp": "At {se} in {mt} market {tc}'s YCP is-",
-            "maketDepth": "At {se} in {mt} market {tc}'s market depth is-",
             "all": "At {se} in {mt} market detailed price information for {tc} is-",
             "marketDepth": "At {se} in {mt} market {tc}'s market depth is-",
             "price": "At {se} in {mt} market price information for {tc} is-",
-            "No": "What do you want to know about {tc}? Please specify clearly-"
+            "No": "What do you want to know about {tc}? Please specify clearly-",
+            None: " not found."
         }
     }    
 }

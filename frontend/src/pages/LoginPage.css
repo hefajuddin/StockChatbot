@@ -1,0 +1,72 @@
+/* পুরো পেজকে সেন্টার করা */
+.login-container {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+}
+
+/* কার্ড */
+.login-card {
+  background: white;
+  padding: 2.5rem 3rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 400px;
+}
+
+/* হেডার */
+.login-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: #2d3436;
+}
+
+/* ফর্ম */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ইনপুট */
+.login-input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #dcdde1;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.login-input:focus {
+  border-color: #0984e3;
+  outline: none;
+}
+
+/* বাটন */
+.login-btn {
+  padding: 0.8rem;
+  background: #0984e3;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.login-btn:hover {
+  background: #0652dd;
+}
+
+/* এরর মেসেজ */
+.login-error {
+  color: #d63031;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}

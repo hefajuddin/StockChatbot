@@ -1,0 +1,15 @@
+
+.chat-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.chat-input {
+  width: 70%;
+  padding: 0.5rem;
+}
+
+.send-button {
+  padding: 0.6rem 1rem;
+}
