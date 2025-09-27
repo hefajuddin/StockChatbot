@@ -420,12 +420,12 @@ trading_codes_mapping_bangla2english = {
     "1JANATAMF": ["১জনতাএমএফ","ফার্স্টজনতাএমএফ"],
 }
 
-trading_market_types_bangla2english={
+trading_market_types_mapping_bangla2english={
     "BLOCK": ["ব্লক"],
     "PUBLIC": ["পাবলিক", "পাব্লিক"],
 }
 
-trading_stock_exchanges_bangla2english={
+trading_stock_exchanges_mapping_bangla2english={
     "DSE": ["ডিএসই"],
     "CSE": ["সিএসই"]    
 }
@@ -461,6 +461,7 @@ phonetic_map = {
 
 # ===================== Utilities =====================
 def normalize_unicode(text):
+    print('normalize_unicode', unicodedata.normalize("NFC", text))
     return unicodedata.normalize("NFC", text)
 
 def phonetic_variants(word, phonetic_map):
@@ -472,6 +473,7 @@ def phonetic_variants(word, phonetic_map):
                 for v in vals:
                     new_variants.add(w.replace(k, v))
         variants |= new_variants
+        print('variants', variants)
     return variants
 
 
@@ -534,9 +536,13 @@ def convert_word(word, mapping, suffix_map, cutoff: int = 80):
 
 bangla2english_mapping = {
     **trading_codes_mapping_bangla2english,
-    **trading_market_types_bangla2english,
-    **trading_stock_exchanges_bangla2english
+    **trading_market_types_mapping_bangla2english,
+    **trading_stock_exchanges_mapping_bangla2english
 }
+
+all_keys = list(trading_codes_mapping_bangla2english.keys()) \
+         + list(trading_market_types_mapping_bangla2english.keys()) \
+         + list(trading_stock_exchanges_mapping_bangla2english.keys())
 
 def convert_sentence(text):
     words = text.split()
@@ -544,18 +550,71 @@ def convert_sentence(text):
     return " ".join(convert_word(w, bangla2english_mapping , suffix_map) for w in words)
 
 
+import re, string
+
+def normalize_text(text, all_keys):
+    placeholders = {}
+    text_with_placeholders = text
+
+    # --- Step 1: keys -> placeholder (case-insensitive) ---
+    for idx, key in enumerate(all_keys):
+        placeholder = f"__KEY{idx}__"
+        placeholders[placeholder] = key
+        # case-insensitive replace
+        pattern = re.compile(re.escape(key), re.IGNORECASE)
+        text_with_placeholders = pattern.sub(placeholder, text_with_placeholders)
+
+    # --- Step 2: repetition কমানো (non-placeholder অংশ) ---
+    def custom_reducer(match):
+        ch = match.group(1)
+        if ch in string.punctuation:
+            return ch          # punctuation → ১টা
+        elif ch.isalpha():
+            return ch * 2      # letter → সর্বোচ্চ ২টা
+        else:
+            return match.group(0)  # digit 그대로
+
+    parts = re.split(r'(__KEY\d+__)', text_with_placeholders)
+    reduced_parts = []
+    for part in parts:
+        if part in placeholders:       # ✅ placeholder untouched
+            reduced_parts.append(part)
+        else:
+            reduced_parts.append(re.sub(r'(.)\1+', custom_reducer, part))
+
+    processed_text = "".join(reduced_parts)
+
+    # --- Step 3: restore ---
+    for placeholder, original in placeholders.items():
+        processed_text = processed_text.replace(placeholder, original)
+
+    print("555", processed_text)
+    return processed_text
+
+
+
+
+
+
 import re
 import random
 import unicodedata
 from html import unescape
 # ---- Preprocess text ----
-def preprocess(text, remove_repetition=True):
+def preprocess(text):
     text = convert_sentence(text)
-    text = text.lower()  # lowercase all English
+    print("111", text)
+    text = normalize_text(text, all_keys)
+    print("222", text)
+    text = text.lower()  
+    print("---", text)
+    
+    # lowercase all English
     # print("preprocessssssssssssssssssss lower", text)
     # text = unicodedata.normalize("NFC", text)
     # print("preprocessssssssssssssssssss nfc", text)
     text = unescape(text)
+    print("...", text)
     
     # Remove HTML tags
     text = re.sub(r'<[^>]+>', ' ', text)
@@ -566,18 +625,14 @@ def preprocess(text, remove_repetition=True):
     
     # Remove extra spaces
     text = re.sub(r'\s+', ' ', text).strip()
-    
-    if remove_repetition:
-        # Reduce repeated letters/punctuations to a single occurrence
-        text = re.sub(r'(.)\1+', r'\1', text)
-    
-    # print("processsssssss", text)
+        
+    print("processsssssss", text)
     return text
 
 
 trading_codes = list(trading_codes_mapping_bangla2english.keys())
-market_types = list(trading_market_types_bangla2english.keys())
-stock_exchanges = list(trading_stock_exchanges_bangla2english.keys())
+market_types = list(trading_market_types_mapping_bangla2english.keys())
+stock_exchanges = list(trading_stock_exchanges_mapping_bangla2english.keys())
 
 # ---- Tokenize while preserving multi-word / special char entities ----
 def tokenize_protect_entities(text, trading_codes, market_types, stock_exchanges):
@@ -600,7 +655,7 @@ def tokenize_protect_entities(text, trading_codes, market_types, stock_exchanges
 
     # Replace placeholders back with original entity
     tokens = [entity_map.get(t, t) for t in tokens]
-    # print("tokenizeeeeeeeeeeeeeeeee", tokens)
+    print("tokenizeeeeeeeeeeeeeeeee", tokens)
 
     return tokens
 

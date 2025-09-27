@@ -455,7 +455,7 @@ async def periodic_refresh(user_id: str):
             # print("access::", access_token)
             # print("refresh::", refresh_token)
             # print("expiry::", expiry_iso)
-            # now = datetime.now()
+            now = datetime.now()
             # print("Local Time::", now)
 
 
@@ -474,7 +474,7 @@ async def periodic_refresh(user_id: str):
                 expiry = None
 
             need_refresh = (not expiry) or (expiry - now <= timedelta(seconds=ACCESS_TOKEN_BUFFER))
-            print(f"[Periodic] Checking refresh for user_id={user_id}, need_refresh={need_refresh}")
+            print(f"[Periodic] Checking refresh for user_id={user_id}, now= {now}, need_refresh={need_refresh}")
 
             if need_refresh:
                 print(f"[Periodic] Calling refresh_if_needed for user_id={user_id}")
@@ -640,23 +640,8 @@ async def logout(authorization: str | None = Header(default=None)):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 async def infer_batch(text_list: list[str], token: str) -> list[dict]:
     results = []
-
     texts = [prepare_text_for_infer(t) for t in text_list]
     inputs = tokenizer(texts, return_tensors="pt", padding=True, truncation=True, max_length=64)
     inputs = {k: v.to(DEVICE) for k, v in inputs.items()}
