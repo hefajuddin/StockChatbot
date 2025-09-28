@@ -473,7 +473,7 @@ def phonetic_variants(word, phonetic_map):
                 for v in vals:
                     new_variants.add(w.replace(k, v))
         variants |= new_variants
-        print('variants', variants)
+        # print('variants', variants)
     return variants
 
 

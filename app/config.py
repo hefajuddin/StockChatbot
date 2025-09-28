@@ -6,5 +6,6 @@ LOGIN_ENDPOINT = f"{BASE_OMS_URL}/Login"
 REFRESH_ENDPOINT = f"{BASE_OMS_URL}/Login/refresh-token"
 SHAREPRICE_ENDPOINT = f"{BASE_OMS_URL}/market-depths"
 PORTFOLIO_ENDPOINT = f"{BASE_OMS_URL}/portfolios"
-BALANCE_ENDPOINT = f"{BASE_OMS_URL}/bo-accounts"
+BO_ENDPOINT = f"{BASE_OMS_URL}/bo-accounts"
+BALANCE_ENDPOINT = f"{BASE_OMS_URL}/bo-account-balances"
 

@@ -12,6 +12,7 @@ KEY_TTL = 7 * 24 * 60 * 60  # seconds
 
 async def save_to_redis(
     user_id: str,
+    boCodes: List[str] = None,
     tradingCodes: List[str] = None,
     marketTypes: List[str] = None,
     stockExchanges: List[str] = None,
@@ -25,6 +26,8 @@ async def save_to_redis(
     key = f"chat:{user_id}"
     mapping = {}
 
+    if boCodes and any(x.strip() for x in boCodes):
+        mapping["boCodes"] = "|".join(boCodes)
     if tradingCodes and any(x.strip() for x in tradingCodes):
         mapping["tradingCodes"] = "|".join(tradingCodes)
     if marketTypes and any(x.strip() for x in marketTypes):

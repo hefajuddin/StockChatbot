@@ -72,6 +72,7 @@ app.add_middleware(
 
 # Pydantic model
 class ChatData(BaseModel):
+    boCodes: List[str]
     tradingCodes: List[str]
     marketTypes: List[str]
     stockExchanges: List[str]
@@ -661,6 +662,7 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
         from collections import OrderedDict 
 
+        boCodes = list(OrderedDict.fromkeys(x["text"] for x in ner_result if "boCode" in x["tag"]))
         tradingCodes = list(OrderedDict.fromkeys(x["text"] for x in ner_result if "tradingCode" in x["tag"]))
         # tradingCodes = [x["text"] for x in ner_result if "tradingCode" in x["tag"]]
         marketTypes = list(OrderedDict.fromkeys(x["text"] for x in ner_result if "marketType" in x["tag"]))
@@ -683,6 +685,7 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
         await save_to_redis(
             user_id,
+            boCodes,
             tradingCodes,
             marketTypes,
             stockExchanges,
@@ -703,6 +706,7 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
         #         for k, v in stored.items()}
 
         # যেসব ফিল্ড '|' দিয়ে সেভ করা, সেগুলো split করে নাও
+        bo_codes   = decoded.get("boCodes", "").split("|")   if decoded.get("boCodes")   else []
         trading_codes   = decoded.get("tradingCodes", "").split("|")   if decoded.get("tradingCodes")   else []
         market_types    = decoded.get("marketTypes", "").split("|")    if decoded.get("marketTypes")    else []
         stock_exchanges = decoded.get("stockExchanges", "").split("|") if decoded.get("stockExchanges") else []
@@ -719,6 +723,7 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
         stock_exchanges = [x for x in stock_exchanges if x] or ["dse"]
         market_types = [x for x in market_types if x] or ["public"]
         trading_codes = [x for x in trading_codes if x] or []
+        bo_codes = [x for x in bo_codes if x] or []
 
 
         combos = list(itertools.product(
