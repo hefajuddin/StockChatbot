@@ -27,14 +27,14 @@
 //               </div>
 //             )}
 
-//             {msg.sender === "bot" && msg.priceResponse && msg.priceList && (
+//             {msg.sender === "bot" && msg.specificResponse && msg.responseList && (
 //               <div>
-//                 {msg.priceResponse.map((r, i) => (
+//                 {msg.specificResponse.map((r, i) => (
 //                   <div key={i}>
 //                     {r}
-//                     {msg.priceList[i] && (
+//                     {msg.responseList[i] && (
 //                       <div style={{ marginLeft: "1rem", marginTop: "0.25rem" }}>
-//                         {Object.keys(msg.priceList[i]).map((key) => {
+//                         {Object.keys(msg.responseList[i]).map((key) => {
 //                           // buySellDetails আলাদা হ্যান্ডল করা
 //                           if (key === "buySellDetails") {
 //                             return (
@@ -53,7 +53,7 @@
 //                                   </tr>
 //                                 </thead>
 //                                 <tbody>
-//                                   {msg.priceList[i][key].map((item, idx2) => (
+//                                   {msg.responseList[i][key].map((item, idx2) => (
 //                                     <tr key={idx2}>
 //                                       <td style={{ background: "#d4edda", padding: "4px" }}>{item.buyPrice}</td>
 //                                       <td style={{ background: "#d4edda", padding: "4px" }}>{item.buyVolume}</td>
@@ -71,7 +71,7 @@
 //                           // সাধারণ প্রাইস ইনফরমেশন
 //                           return (
 //                             <div key={key}>
-//                               {key.toUpperCase()}: {msg.priceList[i][key]}
+//                               {key.toUpperCase()}: {msg.responseList[i][key]}
 //                             </div>
 //                           );
 //                         })}
@@ -126,11 +126,11 @@
 //               </div>
 //             )}
 
-//             {/* priceResponse */}
-//             {msg.sender === "bot" && msg.priceResponse && msg.priceList && (
+//             {/* specificResponse */}
+//             {msg.sender === "bot" && msg.specificResponse && msg.responseList && (
 //               <div>
-//                 {msg.priceResponse.map((r, i) => {
-//                   const priceItem = msg.priceList[i];
+//                 {msg.specificResponse.map((r, i) => {
+//                   const priceItem = msg.responseList[i];
 
 //                   // যদি buySellDetails থাকে
 //                   if (priceItem.buySellDetails) {
@@ -246,13 +246,13 @@
 //               </div>
 //             )}
 
-//             {/* priceResponse + priceList */}
-//             {msg.sender === "bot" && msg.priceResponse && msg.priceList && (
+//             {/* specificResponse + responseList */}
+//             {msg.sender === "bot" && msg.specificResponse && msg.responseList && (
 //               <div>
-//                 {msg.priceResponse.map((r, i) => {
-//                   const priceItem = msg.priceList[i];
+//                 {msg.specificResponse.map((r, i) => {
+//                   const priceItem = msg.responseList[i];
 
-//                   // প্রতিটি response এর আগে priceResponse text
+//                   // প্রতিটি response এর আগে specificResponse text
 //                   return (
 //                     <div key={i} style={{ marginTop: "0.5rem" }}>
 //                       <div style={{ fontWeight: "bold" }}>{r}</div>
@@ -379,13 +379,13 @@
 //               </div>
 //             )}
 
-//             {/* priceResponse + priceList */}
-//             {msg.sender === "bot" && msg.priceResponse && msg.priceList && (
+//             {/* specificResponse + responseList */}
+//             {msg.sender === "bot" && msg.specificResponse && msg.responseList && (
 //               <div>
-//                 {msg.priceResponse.map((r, i) => {
-//                   const priceItem = msg.priceList[i];
+//                 {msg.specificResponse.map((r, i) => {
+//                   const priceItem = msg.responseList[i];
 
-//                   // প্রতিটি response এর আগে priceResponse text
+//                   // প্রতিটি response এর আগে specificResponse text
 //                   return (
 //                     <div key={i} style={{ marginTop: "0.5rem" }}>
 //                       <div style={{ fontWeight: "bold" }}>{r}</div>
@@ -524,13 +524,13 @@ export default function ChatBox({ messages }) {
               </div>
             )}
 
-            {/* priceResponse + priceList */}
-            {msg.sender === "bot" && msg.priceResponse && msg.priceList && (
+            {/* specificResponse + responseList */}
+            {msg.sender === "bot" && msg.specificResponse && msg.responseList && (
               <div>
-                {msg.priceResponse.map((r, i) => {
-                  const priceItem = msg.priceList[i];
+                {msg.specificResponse.map((r, i) => {
+                  const priceItem = msg.responseList[i];
 
-                  // প্রতিটি response এর আগে priceResponse text
+                  // প্রতিটি response এর আগে specificResponse text
                   return (
                     <div key={i} style={{ marginTop: "0.5rem" }}>
                       <div style={{ fontWeight: "bold" }}>{r}</div>

@@ -10,7 +10,7 @@ from app.modelSource import DEVICE, label_maps
 from app.preprocess import prepare_text_for_infer
 from app.decode import decode_ner_confident, get_label
 from app.config import LOGIN_ENDPOINT, REFRESH_ENDPOINT, SHAREPRICE_ENDPOINT, PORTFOLIO_ENDPOINT, BALANCE_ENDPOINT
-from app.utils.response_formatter import build_general_response, filter_priceList
+from app.utils.response_formatter import build_general_response, filter_responseList
 import redis
 from app.redis_utils import r, save_to_redis,get_from_redis,delete_from_redis
 from datetime import datetime, timedelta
@@ -41,7 +41,7 @@ class APIRequest(BaseModel):
 
 class APIResponseItemSimple(BaseModel):
     results: dict  # শুধু generalResponse রাখব
-    priceList: List[dict]
+    responseList: List[dict]
 
 class APIResponseSimple(BaseModel):
     results: List[APIResponseItemSimple]
@@ -731,31 +731,31 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
 
         if intent_label=='balance':
-            balance= []
+            responseList= []
             headers = {
                 "Authorization": f"Bearer {token}",
                 "X-Brokerid": "64915efea94c25659a7d360d"
             }
 
-            bo_codes = [x for x in bo_codes if x] or []
-            boCombos = list(itertools.product(bo_codes))
+            bo_codes = [str(x) for x in bo_codes if x] or []
+            combos = list(itertools.product(bo_codes))
 
-            if endpoint  and intent_label=='balance' and boCombos:
+            if endpoint  and intent_label=='balance' and combos:
                 async with httpx.AsyncClient() as client:
-                    for bo in boCombos:
+                    for bo in combos:
                         url = f"{endpoint}/64915efea94c25659a7d360d|{bo[0]}"
                         try:
                             resp = await client.get(url, headers=headers)
                             if resp.status_code == 200:
-                                balance.append(resp.json())
+                                responseList.append(resp.json())
                             else:
-                                balance.append({
+                                responseList.append({
                                     "error": f"API returned {resp.status_code}",
                                     "details": resp.text,
                                     "text": text
                                 })
                         except Exception as e:
-                            balance.append({
+                            responseList.append({
                                 "error": str(e),
                                 "text": text
                             })
@@ -767,38 +767,126 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
                     # print("Balance:", balance)
                     # return results
 
-                    for item in balance:
-                        if "data" in item and "cashBalance" in item["data"]:
-                            results.append(item["data"]["cashBalance"])
 
-                    print("Cash Balances1:", results)
-                    # return results
+
+
+
+
+                #     for item in balance:
+                #         if "data" in item and "cashBalance" in item["data"]:
+                #             results.append(item["data"]["cashBalance"])
+
+                #     print("Cash Balances1:", results)
+                #     # return results
                     
                     
                         
-                    results.append({
-                        "results": {
-                            # "tradingCodes": trading_codes,
-                            # "marketTypes": market_types,
-                            # "stockExchanges": stock_exchanges,
-                            # "intent": intent_label,
-                            # "sentiment": sentiment_label,
-                            # "language": language_label,
-                            # "priceStatus": priceStatus_label,
-                            # "context": context_label,
-                            "generalResponse": "Your balance is- ",
-                            # "inputText": text
-                        },
+                #     results.append({
+                #         "results": {
+                #             # "tradingCodes": trading_codes,
+                #             # "marketTypes": market_types,
+                #             # "stockExchanges": stock_exchanges,
+                #             # "intent": intent_label,
+                #             # "sentiment": sentiment_label,
+                #             # "language": language_label,
+                #             # "priceStatus": priceStatus_label,
+                #             # "context": context_label,
+                #             "generalResponse": "Your balance is- ",
+                #             # "inputText": text
+                #         },
                     
-                        "priceList": results
-                    })
-                    print("Cash Balances2:", results)
+                #         "responseList": results
+                #     })
+                #     print("Cash Balances2:", results)
 
-                return [{'results': {'generalResponse': {'recommendResponse': [], 'priceResponse': ["Your balance is-"]}}, 'priceList': [{'Cash': results[0]}]}]
+                # return [{'results': {'generalResponse': {'recommendResponse': [], 'specificResponse': ["Your balance is-"]}}, 'responseList': [{'Cash': results[0]}]}]
+
+
+
+                priceStatus_label="balance"
+
+            # === Always build response ===
+                generalResponse = build_general_response(
+                    language_label, sentiment_label, intent_label, priceStatus_label, combos, responseList
+                )
+                print("gggggggggggggggggggggggggggggggggggggggggggggggggggggb", generalResponse)
+
+                
+                #     # === Special Case: price_status, se, mt আছে কিন্তু trading_code নাই ===# generalResponse যদি ডিকশনারি হয় তাহলে এটা
+                # if intent_label and priceStatus_label and not trading_codes:
+                #     generalResponse["recommendResponse"].append(
+                #         "Please provide the TradingCode/Item properly to get expected response."
+                #     )
+
+
+
+                # # if not generalResponse["recommendResponse"] and not generalResponse["specificResponse"]:
+                # if not generalResponse:
+                #     generalResponse["recommendResponse"].append(
+                #         "I need a bit more detail to assist you properly. Could you clarify?"
+                #     )
+
+                # === Filter market depths (if any) ===
+                filtered_prices = filter_responseList(responseList, generalResponse, priceStatus_label, intent_label)
+
+
+                results.append({
+                    "results": {
+                        # "tradingCodes": trading_codes,
+                        # "marketTypes": market_types,
+                        # "stockExchanges": stock_exchanges,
+                        # "intent": intent_label,
+                        # "sentiment": sentiment_label,
+                        # "language": language_label,
+                        # "priceStatus": priceStatus_label,
+                        # "context": context_label,
+                        "generalResponse": generalResponse,
+                        # "inputText": text
+                    },
+                    "responseList": filtered_prices            
+                })
+            print("filtered_pricessssssss:", filtered_prices)    
+            print("Final Resultssssssss:", results)
+            return results
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                     
 # filtered_pricessssssss: [{'ltp': 299.1}]
-# Final Resultssssssss: [{'results': {'generalResponse': {'recommendResponse': [], 'priceResponse': ["At dse in public market gp's LTP is-"]}}, 'priceList': [{'ltp': 299.1}]}]
+# Final Resultssssssss: [{'results': {'generalResponse': {'recommendResponse': [], 'specificResponse': ["At dse in public market gp's LTP is-"]}}, 'responseList': [{'ltp': 299.1}]}]
 
 
 
@@ -806,7 +894,7 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
         if intent_label=='sharePrice' and endpoint and trading_codes:
 
-            priceList = []
+            responseList = []
             headers = {"Authorization": f"Bearer {token}"}
             stock_exchanges = [x for x in stock_exchanges if x] or ["dse"]
             market_types = [x for x in market_types if x] or ["public"]
@@ -831,24 +919,25 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
                     try:
                         resp = await client.get(url, headers=headers)
                         if resp.status_code == 200:
-                            priceList.append(resp.json())
+                            responseList.append(resp.json())
                         else:
-                            priceList.append({
+                            responseList.append({
                                 "error": f"API returned {resp.status_code}",
                                 "details": resp.text,
                                 "text": text
                             })
                     except Exception as e:
-                        priceList.append({
+                        responseList.append({
                             "error": str(e),
                             "text": text
                         })
-        # print("Price List:", priceList)
+        # print("Price List:", responseList)
 
         # === Always build response ===
         generalResponse = build_general_response(
-            language_label, sentiment_label, intent_label, priceStatus_label, combos, priceList
+            language_label, sentiment_label, intent_label, priceStatus_label, combos, responseList
         )
+        print("ggggggggggggggggggggggggggggggggggggggggggggggggggggg", generalResponse)
 
         
         # # === Special Case: price_status, se, mt আছে কিন্তু trading_code নাই ===# generalResponse যদি লিস্ট হয় তাহলে এটা
@@ -870,14 +959,14 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
 
         # === If nothing found but still a valid follow-up ===# generalResponse যদি ডিকশনারি হয় তাহলে এটা
-        # if not generalResponse["recommendResponse"] and not generalResponse["priceResponse"]:
+        # if not generalResponse["recommendResponse"] and not generalResponse["specificResponse"]:
         if not generalResponse:
             generalResponse["recommendResponse"].append(
                 "I need a bit more detail to assist you properly. Could you clarify?"
             )
 
         # === Filter market depths (if any) ===
-        filtered_prices = filter_priceList(priceList, generalResponse, priceStatus_label)
+        filtered_prices = filter_responseList(responseList, generalResponse, priceStatus_label, intent_label)
 
 
         results.append({
@@ -893,7 +982,7 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
                 "generalResponse": generalResponse,
                 # "inputText": text
             },
-            "priceList": filtered_prices            
+            "responseList": filtered_prices            
         })
     print("filtered_pricessssssss:", filtered_prices)    
     print("Final Resultssssssss:", results)

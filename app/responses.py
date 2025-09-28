@@ -21,7 +21,7 @@ RESPONSES = {
             "analysis": "আপাতত শেয়ার এনালাইসিস বিষয়ে আমার যথেষ্ট জ্ঞান নেই। এ বিষয়ে আমি শিখছি...",
             "trade": "আপাতত শেয়ার বাই/সেল বিষয়ে আমার যথেষ্ট জ্ঞান নেই। এ বিষয়ে আমি শিখছি...",
             "portfolio": "আপাতত এই বিষয়ে আমার যথেষ্ট জ্ঞান নেই। এ বিষয়ে আমি শিখছি...",
-            "balance": "আপাতত এই বিষয়ে আমার যথেষ্ট জ্ঞান নেই। এ বিষয়ে আমি শিখছি...",
+            
             "other": "আপাতত এই বিষয়ে আমার যথেষ্ট জ্ঞান নেই। দয়াকরে বাংলাদেশ স্টক মার্কেট সম্পর্কে স্পষ্ট প্রশ্ন করুন।",
             "dialogue": "দয়াকরে বাংলাদেশ স্টক মার্কেট সম্পর্কে স্পষ্ট প্রশ্ন করুন।",
             "comment": "ধন্যবাদ। বুঝতে পেরেছি...,",
@@ -37,6 +37,9 @@ RESPONSES = {
             "price": "{se} তে {mt} মার্কেটে {tc} এর price সম্পর্কে তথ্য-",
             "No": "{tc} এর সম্পর্কে আপনি কী জানতে চান, দয়াকরে স্পষ্টভাবে বলুন-",
             None: " পাওয়া যায়নি।"
+        },
+        "balance":{
+            "balance": "{code} এর ব্যালেন্স হলো-",
         },
 
     },
@@ -61,7 +64,7 @@ RESPONSES = {
             "analysis": "apatoto ei bisoye amar jothesto gyan nei. ei bisoye ami shikhchi...",
             "trade": "apatoto ei bisoye amar jothesto gyan nei. ei bisoye ami shikhchi...",
             "portfolio": "apatoto ei bisoye amar jothesto gyan nei. ei bisoye ami shikhchi...",
-            "balance": "apatoto ei bisoye amar jothesto gyan nei. ei bisoye ami shikhchi...",
+            # "balance": "{code} er balance holo-",
             "other": "apatoto ei bisoye amar jothesto gyan nei. doyakore bangladesh stock market somporke spostho proshno korun.",
             "dialogue": "doyakore bangladesh stock market somporke spostho proshno korun.",
             "comment": "dhonnobad. bujhte perechi...,",
@@ -77,7 +80,11 @@ RESPONSES = {
             "price": "{se} te {mt} market e {tc} er price somporke tottho-",
             "No": "{tc} er somporke apni ki jante chan, doyakore spostho bhabe bolun-",
             None: " paoa jai ni।"
-        }
+        },
+        
+        "balance":{
+            "balance": "{code} er balance holo-",
+        },
     },
 
     "en": {
@@ -100,7 +107,7 @@ RESPONSES = {
             "analysis": "I don't have enough knowledge on this topic yet. I'm still learning...",
             "trade": "I don't have enough knowledge on this topic yet. I'm still learning...",
             "portfolio": "I don't have enough knowledge on this topic yet. I'm still learning...",
-            "balance": "I don't have enough knowledge on this topic yet. I'm still learning...",
+            # "balance": "{code}'s balance is-",
             "other": "I don't have enough knowledge on this topic yet. Please ask a clear question about the Bangladesh stock market.",
             "dialogue": "Please ask a clear question about the Bangladesh stock market.",
             "comment": "Thank you. I understand...,",
@@ -116,6 +123,10 @@ RESPONSES = {
             "price": "At {se} in {mt} market price information for {tc} is-",
             "No": "What do you want to know about {tc}? Please specify clearly-",
             None: " not found."
-        }
+        },
+        
+        "balance":{
+            "balance": "{code}'s balance is-",
+        },
     }    
 }

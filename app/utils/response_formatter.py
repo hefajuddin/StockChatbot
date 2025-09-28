@@ -49,14 +49,14 @@ def build_general_response(
     intent_label: str,
     priceStatus_label: str,
     combos: List[tuple],
-    priceList: List[dict] = None
+    responseList: List[dict] = None
 ) -> Dict[str, List[str]]:
     """
     language_label, sentiment_label, intent_label, priceStatus_label অনুযায়ী
-    recommendResponse এবং priceResponse আলাদা আকারে বানিয়ে রিটার্ন করবে।
+    recommendResponse এবং specificResponse আলাদা আকারে বানিয়ে রিটার্ন করবে।
     """
     recommendResponse: List[str] = []
-    priceResponse: List[str] = []
+    specificResponse: List[str] = []
 
     # language_label সাপোর্ট না করলে default 'bn'
     lang_responses = RESPONSES.get(language_label, RESPONSES.get("bn", {}))
@@ -68,16 +68,36 @@ def build_general_response(
 
     # === Intent ===
     if intent_label == "sharePrice":
+        print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', combos, priceStatus_label)
         template = lang_responses.get("sharePrice", {}).get(priceStatus_label)
+        print("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy", template)
         if template and combos:
             for se, mt, tc in combos:
+                print("zzzz", (se, mt, tc))
                 values = {
                     "se": se or "dse",
                     "mt": mt or "public",
                     "tc": tc.lower() if tc else ""
                 }
+                print('sssssssssssssssssssssssssssssss', values)
  
-                priceResponse.append(template.format(**values))
+                specificResponse.append(template.format(**values))
+    
+    
+    elif intent_label == "balance":
+        print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', combos, priceStatus_label)
+        template = lang_responses.get("balance", {}).get(priceStatus_label)
+        print("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy", template)
+        if template and combos:
+            for code in combos:
+                print("zzzz", code)
+                values = {
+                    "code": code.lower() if isinstance(code, str) else code[0]
+                }
+                print('sssssssssssssssssssssssssssssss', values)
+                
+                specificResponse.append(template.format(**values))
+        
                 
     else:
         # অন্য intent হলে সরাসরি recommendResponse-এ
@@ -87,32 +107,41 @@ def build_general_response(
 
     return {
         "recommendResponse": recommendResponse,
-        "priceResponse": priceResponse
+        "specificResponse": specificResponse
     }
 
 
 
-def filter_priceList(priceList: List[dict], generalResponse: List[str], status=None) -> List[dict]:
-    if not priceList:
+def filter_responseList(responseList: List[dict], generalResponse: List[str], status=None, intent_label=None) -> List[dict]:
+    if not responseList:
         return []   # follow-up case → just return empty list
 
     if not generalResponse:
         return ["Please input more specific..."]
-
-    keyword_map = {
-        "volume": ["volume"],
-        "ltp": ["ltp"],
-        "value": ["value"],
-        "ycp": ["ycp"],
-        "marketDepth": ["buySellDetails"],
-        "all": ["open", "ltp", "ycp", "close", "high", "low", "trade", "volume", "value", "change"],
-        "price": ["open", "ltp", "ycp", "close", "high", "low"],
-        "No": [],
-        None: [],
-    }
+    
+    keyword_map = {}
+    if intent_label == "sharePrice":
+        keyword_map = {
+            "volume": ["volume"],
+            "ltp": ["ltp"],
+            "value": ["value"],
+            "ycp": ["ycp"],
+            "marketDepth": ["buySellDetails"],
+            "all": ["open", "ltp", "ycp", "close", "high", "low", "trade", "volume", "value", "change"],
+            "price": ["open", "ltp", "ycp", "close", "high", "low"],
+            "No": [],
+            None: [],
+        }
+    if intent_label == "balance":
+        status="balance"
+        keyword_map = {
+            "balance": ["cashBalance", "maturedBalance"],
+            "No": [],
+            None: [],
+        }
 
     filtered = []
-    for depth in priceList:
+    for depth in responseList:
         data = depth.get("data", {})
         selected = {}
 
