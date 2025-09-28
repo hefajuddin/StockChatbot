@@ -730,35 +730,101 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
 
 
+        if intent_label=='balance':
+            balance= []
+            headers = {
+                "Authorization": f"Bearer {token}",
+                "X-Brokerid": "64915efea94c25659a7d360d"
+            }
+
+            bo_codes = [x for x in bo_codes if x] or []
+            boCombos = list(itertools.product(bo_codes))
+
+            if endpoint  and intent_label=='balance' and boCombos:
+                async with httpx.AsyncClient() as client:
+                    for bo in boCombos:
+                        url = f"{endpoint}/64915efea94c25659a7d360d|{bo[0]}"
+                        try:
+                            resp = await client.get(url, headers=headers)
+                            if resp.status_code == 200:
+                                balance.append(resp.json())
+                            else:
+                                balance.append({
+                                    "error": f"API returned {resp.status_code}",
+                                    "details": resp.text,
+                                    "text": text
+                                })
+                        except Exception as e:
+                            balance.append({
+                                "error": str(e),
+                                "text": text
+                            })
+                    #         results.append({
+                    #             "results": {
+                    #                 "balance": balance
+                    #             },
+                    #         })
+                    # print("Balance:", balance)
+                    # return results
+
+                    for item in balance:
+                        if "data" in item and "cashBalance" in item["data"]:
+                            results.append(item["data"]["cashBalance"])
+
+                    print("Cash Balances1:", results)
+                    # return results
+                    
+                    
+                        
+                    results.append({
+                        "results": {
+                            # "tradingCodes": trading_codes,
+                            # "marketTypes": market_types,
+                            # "stockExchanges": stock_exchanges,
+                            # "intent": intent_label,
+                            # "sentiment": sentiment_label,
+                            # "language": language_label,
+                            # "priceStatus": priceStatus_label,
+                            # "context": context_label,
+                            "generalResponse": "Your balance is- ",
+                            # "inputText": text
+                        },
+                    
+                        "priceList": results
+                    })
+                    print("Cash Balances2:", results)
+
+                return [{'results': {'generalResponse': {'recommendResponse': [], 'priceResponse': ["Your balance is-"]}}, 'priceList': [{'Cash': results[0]}]}]
+
+                    
+# filtered_pricessssssss: [{'ltp': 299.1}]
+# Final Resultssssssss: [{'results': {'generalResponse': {'recommendResponse': [], 'priceResponse': ["At dse in public market gp's LTP is-"]}}, 'priceList': [{'ltp': 299.1}]}]
 
 
 
 
 
-
-
-
-
-
-        priceList = []
-        headers = {"Authorization": f"Bearer {token}"}
-        stock_exchanges = [x for x in stock_exchanges if x] or ["dse"]
-        market_types = [x for x in market_types if x] or ["public"]
-        trading_codes = [x for x in trading_codes if x] or []
-        bo_codes = [x for x in bo_codes if x] or []
-
-
-        combos = list(itertools.product(
-            stock_exchanges,
-            market_types,
-            trading_codes
-        ))
-        # print("Combos:", combos)
-
-        # এখন combos থেকে API কল
-        # === API Call (only if trading_codes exist) ===
-        # print("Endpoint:", endpoint, "Trading Codes:", trading_codes)
         if intent_label=='sharePrice' and endpoint and trading_codes:
+
+            priceList = []
+            headers = {"Authorization": f"Bearer {token}"}
+            stock_exchanges = [x for x in stock_exchanges if x] or ["dse"]
+            market_types = [x for x in market_types if x] or ["public"]
+            trading_codes = [x for x in trading_codes if x] or []
+            bo_codes = [x for x in bo_codes if x] or []
+
+
+            combos = list(itertools.product(
+                stock_exchanges,
+                market_types,
+                trading_codes
+            ))
+            # print("Combos:", combos)
+
+            # এখন combos থেকে API কল
+            # === API Call (only if trading_codes exist) ===
+            # print("Endpoint:", endpoint, "Trading Codes:", trading_codes)
+        
             async with httpx.AsyncClient() as client:
                 for se, mt, tc in combos:
                     url = f"{endpoint}/{se}/{mt}/{tc}"
@@ -816,20 +882,21 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
         results.append({
             "results": {
-                "tradingCodes": trading_codes,
-                "marketTypes": market_types,
-                "stockExchanges": stock_exchanges,
-                "intent": intent_label,
-                "sentiment": sentiment_label,
-                "language": language_label,
-                "priceStatus": priceStatus_label,
-                "context": context_label,
+                # "tradingCodes": trading_codes,
+                # "marketTypes": market_types,
+                # "stockExchanges": stock_exchanges,
+                # "intent": intent_label,
+                # "sentiment": sentiment_label,
+                # "language": language_label,
+                # "priceStatus": priceStatus_label,
+                # "context": context_label,
                 "generalResponse": generalResponse,
-                "inputText": text
+                # "inputText": text
             },
-            "priceList": filtered_prices
+            "priceList": filtered_prices            
         })
-
+    print("filtered_pricessssssss:", filtered_prices)    
+    print("Final Resultssssssss:", results)
     return results
 
 
