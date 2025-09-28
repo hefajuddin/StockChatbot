@@ -111,7 +111,7 @@ async def login(request: LoginRequest):
     payload = {
         "loginId": request.loginId,
         "password": request.password,
-        "deviceId": request.deviceId or "web-ui",
+        "deviceId": request.deviceId or "c5d334f5-5c81-41f1-8b77-87485242424c",
     }
 
     async with httpx.AsyncClient() as client:
@@ -349,13 +349,13 @@ async def get_valid_token(current_access_token: str, user_id: str) -> str:
     # session = await r.hgetall(session_key) or {}
     # stored_access = (session.get("accessToken") or "").strip()
     # expiry_iso = session.get("expiry") or ""
-    # device_id = session.get("deviceId") or "web-ui"
+    # device_id = session.get("deviceId") or "c5d334f5-5c81-41f1-8b77-87485242424c"
 
 
     data = await read_session(user_id)
     stored_access = (data.get("accessToken") or "").strip()
     expiry_iso = data.get("expiry") or ""    
-    device_id = data.get("deviceId") or "web-ui"
+    device_id = data.get("deviceId") or "c5d334f5-5c81-41f1-8b77-87485242424c"
 
 
 
@@ -438,7 +438,7 @@ async def periodic_refresh(user_id: str):
 
             # access_token = (session.get("accessToken") or "").strip()
             # expiry_iso = session.get("expiry") or ""
-            # device_id = session.get("deviceId") or "web-ui"
+            # device_id = session.get("deviceId") or "c5d334f5-5c81-41f1-8b77-87485242424c"
             # refresh_key = f"refresh:{user_id.strip()}"
             # refresh_token = await r.get(refresh_key)
 
@@ -446,7 +446,7 @@ async def periodic_refresh(user_id: str):
             data = await read_session(user_id)
             access_token = (data.get("accessToken") or "").strip()
             expiry_iso = data.get("expiry") or ""    
-            device_id = data.get("deviceId") or "web-ui"
+            device_id = data.get("deviceId") or "c5d334f5-5c81-41f1-8b77-87485242424c"
 
             refresh_key = f"refresh:{user_id.strip()}"
             val = await r.get(refresh_key)
@@ -718,6 +718,28 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
         # print("Decoded redis data:", decoded)
 
+            # === Endpoint Mapping ===
+        if intent_label == 'sharePrice':
+            endpoint = SHAREPRICE_ENDPOINT
+        elif intent_label == 'portfolio':
+            endpoint = PORTFOLIO_ENDPOINT
+        elif intent_label == 'balance':
+            endpoint = BALANCE_ENDPOINT
+        else:
+            endpoint = None
+
+
+
+
+
+
+
+
+
+
+
+
+
         priceList = []
         headers = {"Authorization": f"Bearer {token}"}
         stock_exchanges = [x for x in stock_exchanges if x] or ["dse"]
@@ -733,23 +755,10 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
         ))
         # print("Combos:", combos)
 
-
-            # === Endpoint Mapping ===
-        if intent_label == 'sharePrice':
-            endpoint = SHAREPRICE_ENDPOINT
-        elif intent_label == 'portfolio':
-            endpoint = PORTFOLIO_ENDPOINT
-        elif intent_label == 'balance':
-            endpoint = BALANCE_ENDPOINT
-        else:
-            endpoint = None
-
-
-
         # এখন combos থেকে API কল
         # === API Call (only if trading_codes exist) ===
         # print("Endpoint:", endpoint, "Trading Codes:", trading_codes)
-        if endpoint and trading_codes:
+        if intent_label=='sharePrice' and endpoint and trading_codes:
             async with httpx.AsyncClient() as client:
                 for se, mt, tc in combos:
                     url = f"{endpoint}/{se}/{mt}/{tc}"
