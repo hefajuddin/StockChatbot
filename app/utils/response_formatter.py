@@ -2,9 +2,9 @@
 # from typing import List, Dict
 # from app.responses import RESPONSES
 
-# def build_general_response(language_label, sentiment_label, intent_label, priceStatus_label, combos):
+# def build_general_response(language_label, sentiment_label, intent_label, status_label, combos):
 #     """
-#     language_label, sentiment_label, intent_label, priceStatus_label অনুযায়ী
+#     language_label, sentiment_label, intent_label, status_label অনুযায়ী
 #     generalResponse তৈরী করবে। RESPONSES থেকে টেমপ্লেট নিয়ে।
 #     """
 #     generalResponse = []
@@ -19,7 +19,7 @@
 
 #     # === Intent ===
 #     if intent_label == "sharePrice":
-#         template = lang_responses.get("sharePrice", {}).get(priceStatus_label)
+#         template = lang_responses.get("sharePrice", {}).get(status_label)
 #         if template and combos:
 #             for se, mt, tc in combos:
 #                 values = {
@@ -47,12 +47,12 @@ def build_general_response(
     language_label: str,
     sentiment_label: str,
     intent_label: str,
-    priceStatus_label: str,
-    combos: List[tuple],
+    status_label: str=None,
+    combos: List[tuple]=None,
     responseList: List[dict] = None
 ) -> Dict[str, List[str]]:
     """
-    language_label, sentiment_label, intent_label, priceStatus_label অনুযায়ী
+    language_label, sentiment_label, intent_label, status_label অনুযায়ী
     recommendResponse এবং specificResponse আলাদা আকারে বানিয়ে রিটার্ন করবে।
     """
     recommendResponse: List[str] = []
@@ -63,13 +63,14 @@ def build_general_response(
 
     # === Sentiment অংশ recommendResponse-এ ===
     sentiment_text = lang_responses.get("sentiment", {}).get(sentiment_label)
+    
     if sentiment_text:
         recommendResponse.append(sentiment_text)
 
     # === Intent ===
     if intent_label == "sharePrice":
-        print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', combos, priceStatus_label)
-        template = lang_responses.get("sharePrice", {}).get(priceStatus_label)
+        print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', combos, status_label)
+        template = lang_responses.get("sharePrice", {}).get(status_label)
         print("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy", template)
         if template and combos:
             for se, mt, tc in combos:
@@ -85,8 +86,8 @@ def build_general_response(
     
     
     elif intent_label == "balance":
-        print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', combos, priceStatus_label)
-        template = lang_responses.get("balance", {}).get(priceStatus_label)
+        print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', combos, status_label)
+        template = lang_responses.get("balance", {}).get(status_label)
         print("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy", template)
         if template and combos:
             for code in combos:
@@ -100,10 +101,12 @@ def build_general_response(
         
                 
     else:
+        
         # অন্য intent হলে সরাসরি recommendResponse-এ
         intent_text = lang_responses.get("intent", {}).get(intent_label)
         if intent_text:
             recommendResponse.append(intent_text)
+        print("kkkkkkkkkkkkkkkkkkkkkkkkkk", intent_label, language_label, sentiment_label, status_label, intent_text, recommendResponse)
 
     return {
         "recommendResponse": recommendResponse,

@@ -6,7 +6,7 @@ from .modelSource import DEVICE, MODEL_PATH, label_maps
 
 class MultiTaskXLMRModel(nn.Module):
     def __init__(self, model_checkpoint, num_ner_labels, num_intent_labels,
-                 num_sentiment_labels, num_priceStatus_labels,
+                 num_sentiment_labels, num_status_labels,
                  num_language_labels, num_context_labels):
         super().__init__()
         self.backbone = AutoModel.from_pretrained(model_checkpoint)
@@ -15,7 +15,7 @@ class MultiTaskXLMRModel(nn.Module):
         self.ner_classifier       = nn.Linear(hidden_size, num_ner_labels)
         self.intent_classifier    = nn.Linear(hidden_size, num_intent_labels)
         self.sentiment_classifier = nn.Linear(hidden_size, num_sentiment_labels)
-        self.price_classifier     = nn.Linear(hidden_size, num_priceStatus_labels)
+        self.price_classifier     = nn.Linear(hidden_size, num_status_labels)
         self.language_classifier  = nn.Linear(hidden_size, num_language_labels)
         self.context_classifier   = nn.Linear(hidden_size, num_context_labels)
 
@@ -40,7 +40,7 @@ model = MultiTaskXLMRModel(
     num_ner_labels=len(label_maps["ner_label2id"]),
     num_intent_labels=len(label_maps["intent_label2id"]),
     num_sentiment_labels=len(label_maps["sentiment_label2id"]),
-    num_priceStatus_labels=len(label_maps["priceStatus_label2id"]),
+    num_status_labels=len(label_maps["priceStatus_label2id"]),
     num_language_labels=len(label_maps["language_label2id"]),
     num_context_labels=len(label_maps["context_label2id"])
 )
