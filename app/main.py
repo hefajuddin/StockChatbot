@@ -729,19 +729,23 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
             endpoint = None
         print("5555555555555555555:", language_label, sentiment_label, intent_label, status_label)
 
-
+        generalResponse = {
+            "specificResponse": [],
+            "recommendResponse": []
+        }
+        combos = []
         responseList= []
         if intent_label=='balance':
-
+            bo_codes = [str(x) for x in bo_codes if x] or []
+            combos = list(itertools.product(bo_codes))
+            status_label="balance"
+            
             headers = {
                 "Authorization": f"Bearer {token}",
                 "X-Brokerid": X_BROKER_ID
             }
 
-            bo_codes = [str(x) for x in bo_codes if x] or []
-            combos = list(itertools.product(bo_codes))
-
-            if endpoint  and intent_label=='balance' and combos:
+            if endpoint and combos:
                 async with httpx.AsyncClient() as client:
                     for bo in combos:
                         url = f"{endpoint}/{X_BROKER_ID}|{bo[0]}"# 64915efea94c25659a7d360d puji broker id
@@ -761,56 +765,6 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
                                 "text": text
                             })
 
-                status_label="balance"
-
-            # === Always build response ===
-                
-                generalResponse = build_general_response(
-                    language_label, sentiment_label, intent_label, status_label, combos, responseList
-                )
-                print("gggggggggggggggggggggggggggggggggggggggggggggggggggggb", generalResponse)
-
-                
-                    # === Special Case: price_status, se, mt আছে কিন্তু trading_code নাই ===# generalResponse যদি ডিকশনারি হয় তাহলে এটা
-                if intent_label=="balance" and not boCodes:
-                    generalResponse["recommendResponse"].append(
-                        "Please input your Bo Code-"
-                    )
-
-
-                # # if not generalResponse["recommendResponse"] and not generalResponse["specificResponse"]:
-                if not generalResponse:
-                    generalResponse["recommendResponse"].append(
-                        "I need a bit more specific to assist you properly. Could you clarify?"
-                    )
-
-                # === Filter market depths (if any) ===
-                filtered_response = filter_responseList(responseList, generalResponse, status_label, intent_label)
-
-
-                results.append({
-                    "results": {
-                        "tradingCodes": trading_codes,
-                        "marketTypes": market_types,
-                        "stockExchanges": stock_exchanges,
-                        "intent": intent_label,
-                        "sentiment": sentiment_label,
-                        "language": language_label,
-                        "priceStatus": status_label,
-                        "context": context_label,
-                        "generalResponse": generalResponse,
-                        "inputText": text
-                    },
-                    "responseList": filtered_response            
-                })
-            print("filtered_responsesssssss:", filtered_response)    
-            print("Final Resultssssssss:", results)
-            return results
-
-
-
-
-
 
         if intent_label=='sharePrice' and endpoint and trading_codes:
 
@@ -827,7 +781,7 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
                 market_types,
                 trading_codes
             ))
-            # print("Combos:", combos)
+            print("Combos:", combos)
 
             # এখন combos থেকে API কল
             # === API Call (only if trading_codes exist) ===
@@ -855,33 +809,37 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
 
         # === Always build response ===
                 
-                generalResponse = build_general_response(
-                    language_label, sentiment_label, intent_label, status_label, combos, responseList
-                )
-                print("ggggggggggggggggggggggggggggggggggggggggggggggggggggg", generalResponse)
+        generalResponse = build_general_response(
+            language_label, sentiment_label, intent_label, status_label, combos, responseList
+        )
+        print("ggggggggggggggggggggggggggggggggggggggggggggggggggggg", generalResponse)
+        
                 
-                
-                if intent_label and status_label and not trading_codes:
-                    generalResponse["recommendResponse"].append(
-                        "Please provide the TradingCode/Item properly to get expected response."
-                    )
+        if intent_label=='sharePrice' and status_label and not trading_codes:
+            generalResponse["recommendResponse"].append(
+                "Please provide the TradingCode/Item properly to get expected response."
+            )
 
-                if not generalResponse:
-                    generalResponse["recommendResponse"].append(
-                        "I need a bit more specific to assist you properly. Could you clarify?"
-                    )
+        if not generalResponse:
+            generalResponse["recommendResponse"].append(
+                "I need a bit more specific to assist you properly. Could you clarify?"
+            )
 
         if intent_label!='sharePrice' and intent_label!='balance':
             generalResponse = build_general_response(
                 language_label, sentiment_label, intent_label
             )            
 
-            if not generalResponse:
-                generalResponse["recommendResponse"].append(
-                    "I need a bit more specific to assist you properly. Could you clarify?"
-                )
-        
-     
+        if not generalResponse:
+            generalResponse["recommendResponse"].append(
+                "I need a bit more specific to assist you properly. Could you clarify?"
+            )
+            
+        if intent_label=='balance' and not boCodes:
+            generalResponse["recommendResponse"].append(
+                "Please input your Bo Code-"
+            )
+    
 
         # === Filter market depths (if any) ===
         filtered_response = filter_responseList(responseList, generalResponse, status_label, intent_label)
@@ -907,5 +865,3 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
     print("filtered_responsesssssss1111111111111111:", filtered_response)
     print("Final Resultssssssss11111111111111111111:", results)
     return results
-
-

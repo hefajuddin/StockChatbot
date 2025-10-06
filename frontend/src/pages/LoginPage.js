@@ -6,7 +6,7 @@ import "./LoginPage.css";   // CSS ফাইল লোড
 export default function LoginPage() {
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
-  const [deviceId, setDeviceId] = useState("c5d334f5-5c81-41f1-8b77-87485242424c");//718e3345-220b-4af3-b547-46f1030cd7b1
+  const [deviceId, setDeviceId] = useState("718e3345-220b-4af3-b547-46f1030cd7b1");//test: 718e3345-220b-4af3-b547-46f1030cd7b1//puji: c5d334f5-5c81-41f1-8b77-87485242424c
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
