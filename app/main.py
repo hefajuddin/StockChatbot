@@ -835,9 +835,19 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
                 "I need a bit more specific to assist you properly. Could you clarify?"
             )
             
-        if intent_label=='balance' and not boCodes:
+        if intent_label=='balance' and not bo_codes and not trading_codes:
             generalResponse["recommendResponse"].append(
                 "Please input your Bo Code-"
+            )
+            
+        if intent_label=='balance' and trading_codes and not (trading_codes and bo_codes):
+            generalResponse["recommendResponse"].append(
+                f"Please ask clear and specific question-"
+            )
+            
+        if intent_label=='sharePrice' and bo_codes and not (trading_codes and bo_codes):
+            generalResponse["recommendResponse"].append(
+                f"Please ask clear and specific question-"
             )
     
 
@@ -859,7 +869,12 @@ async def infer_batch(text_list: list[str], token: str) -> list[dict]:
                 "generalResponse": generalResponse,
                 "inputText": text
             },
-            "responseList": filtered_response
+            # "responseList": filtered_response
+            "responseList": [
+                {('cash' if k == 'cashBalance' else 'matured' if k == 'maturedBalance' else k): v
+                for k, v in d.items()}
+                for d in filtered_response
+            ]
         })
     print("General Responseeeeeeeeee111111111111111:", generalResponse)
     print("filtered_responsesssssss1111111111111111:", filtered_response)
